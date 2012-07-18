@@ -1,5 +1,9 @@
 require "changeling/version"
 
 module Changeling
-  # Your code goes here...
+  autoload :Trackling, 'changeling/trackling'
+
+  module Models
+    autoload :Logling, 'changeling/models/logling'
+  end
 end
