@@ -14,4 +14,13 @@ Gem::Specification.new do |gem|
   gem.name          = "changeling"
   gem.require_paths = ["lib"]
   gem.version       = Changeling::VERSION
+
+  # Dependencies
+  gem.add_dependency "redis"
+
+  # Development Dependencies
+  gem.add_development_dependency "mongoid", "2.4.1"
+  gem.add_development_dependency "activerecord", "3.1.3"
+  gem.add_development_dependency "bson_ext"
+  gem.add_development_dependency "database_cleaner"
 end
