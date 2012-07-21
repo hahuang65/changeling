@@ -14,6 +14,24 @@ describe Changeling::Models::Logling do
       @logling = @klass.new(@object, @changes)
     end
 
+    describe ".as_json" do
+      it "should include the object's before attribute" do
+        @logling.should_receive(:before)
+      end
+
+      it "should include the object's after attribute" do
+        @logling.should_receive(:after)
+      end
+
+      it "should include the object's changed_at attribute" do
+        @logling.should_receive(:changed_at)
+      end
+
+      after(:each) do
+        @logling.as_json
+      end
+    end
+
     describe ".create" do
       before(:each) do
         @object.stub(:changes).and_return(@changes)
@@ -83,12 +101,10 @@ describe Changeling::Models::Logling do
 
       it "should generate a key for storing in Redis" do
         @logling.should_receive(:redis_key)
-        @logling.save
       end
 
       it "should serialize the logling" do
         @logling.should_receive(:serialize)
-        @logling.save
       end
 
       it "should push the serialized object into Redis" do
@@ -97,12 +113,17 @@ describe Changeling::Models::Logling do
         @logling.stub(:redis_key).and_return(@key)
         @logling.stub(:serialize).and_return(@value)
         @redis.should_receive(:lpush).with(@key, @value)
+      end
+
+      after(:each) do
         @logling.save
       end
     end
 
     describe ".serialize" do
-
+      it "should JSON-ify the as_json object" do
+        @logling.serialize.should == @logling.as_json.to_json
+      end
     end
   end
 end

@@ -22,6 +22,14 @@ module Changeling
         end
       end
 
+      def as_json
+        {
+          :before => self.before,
+          :after => self.after,
+          :changed_at => self.changed_at
+        }
+      end
+
       def initialize(object, changes)
         self.klass = object.class.to_s.underscore.pluralize
         self.object_id = object.id.to_s
@@ -43,9 +51,7 @@ module Changeling
       end
 
       def serialize
-        {
-
-        }
+        self.as_json.to_json
       end
     end
   end
