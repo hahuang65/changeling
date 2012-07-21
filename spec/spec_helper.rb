@@ -23,3 +23,19 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 end
+
+def models
+  @models = {
+    BlogPost => {
+      :options => {
+        :title => "Changeling",
+        :content => "Something about Changeling",
+        :public => false
+      },
+      :changes => {
+        "public" => [false, true],
+        "content" => ["Something about Changeling", "Content about Changeling"]
+      }
+    }
+  }
+end

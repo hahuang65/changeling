@@ -5,22 +5,28 @@ describe Changeling::Trackling do
     @klass = Changeling::Models::Logling
   end
 
-  before(:each) do
-    @blog_post = BlogPost.new(:title => "Changeling", :content => "Something about Changeling", :public => false)
-  end
+  models.each_pair do |model, args|
+    before(:each) do
+      @object = model.new(args[:options])
+      @changes = args[:changes]
+    end
 
-  it "should not create a logling when doing the initial save of a new object" do
-    @klass.should_not_receive(:create)
-    @blog_post.save!
-  end
+    it "should not create a logling when doing the initial save of a new object" do
+      @klass.should_not_receive(:create)
+      @object.save!
+    end
 
-  it "should create a logling with the changed attributes of an object when it is saved" do
-    # Persist object to DB so we can update it.
-    @blog_post.save!
+    it "should create a logling with the changed attributes of an object when it is saved" do
+      # Persist object to DB so we can update it.
+      @object.save!
 
-    @klass.should_receive(:create).with(@blog_post, { "public" => [false, true], "content" => ["Something about Changeling", "Content about Changeling"] })
-    @blog_post.public = true
-    @blog_post.content = "Content about Changeling"
-    @blog_post.save!
+      @klass.should_receive(:create).with(@object, @changes)
+
+      @changes.each_pair do |k, v|
+        @object.send("#{k}=", v[1])
+      end
+
+      @object.save!
+    end
   end
 end

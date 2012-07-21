@@ -5,61 +5,104 @@ describe Changeling::Models::Logling do
     @klass = Changeling::Models::Logling
   end
 
-  describe ".new" do
+  # .models is defined in spec_helper.
+  models.each_pair do |model, args|
     before(:each) do
-      @blog_post = BlogPost.new
-      @changes = { "public" => [false, true], "content" => ["Something about Changeling", "Content about Changeling"] }
+      @object = model.new(args[:options])
+      @changes = args[:changes]
 
-      @before, @after = @klass.parse_changes(@changes)
-
-      @logling = @klass.new(@blog_post, @changes)
+      @logling = @klass.new(@object, @changes)
     end
 
-    it "should set klass as the pluralized version of the class name" do
-      @logling.klass.should == @blog_post.class.to_s.underscore.pluralize
+    describe ".create" do
+      before(:each) do
+        @object.stub(:changes).and_return(@changes)
+
+        @klass.should_receive(:new).with(@object, @changes).and_return(@logling)
+      end
+
+      it "should call new with it's parameters then save the initialized logling" do
+        @logling.should_receive(:save)
+
+        @klass.create(@object, @changes)
+      end
     end
 
-    it "should set object_id as the stringified object's ID" do
-      @logling.object_id.should == @blog_post.id.to_s
+    describe ".new" do
+      before(:each) do
+        @before, @after = @klass.parse_changes(@changes)
+      end
+
+      it "should set klass as the pluralized version of the class name" do
+        @logling.klass.should == @object.class.to_s.underscore.pluralize
+      end
+
+      it "should set object_id as the stringified object's ID" do
+        @logling.object_id.should == @object.id.to_s
+      end
+
+      it "should set before and after based on .parse_changes" do
+        @logling.before.should == @before
+        @logling.after.should == @after
+      end
+
+      it "should set changed_at to the object's time of update" do
+        @logling.changed_at.should == @object.updated_at
+      end
     end
 
-    it "should set before and after based on .parse_changes" do
-      @logling.before.should == @before
-      @logling.after.should == @after
-    end
-  end
+    describe ".parse_changes" do
+      before(:each) do
+        @object.save!
 
-  describe ".create" do
-    before(:each) do
-      @blog_post = BlogPost.new
-      @changes = { "public" => [false, true], "content" => ["Something about Changeling", "Content about Changeling"] }
-      @blog_post.stub(:changes).and_return(@changes)
+        @before = @object.attributes.select { |attr| @changes.keys.include?(attr) }
 
-      @logling = @klass.new(@blog_post, @changes)
-      @klass.should_receive(:new).with(@blog_post, @changes).and_return(@logling)
-    end
+        @changes.each_pair do |k, v|
+          @object.send("#{k}=", v[1])
+        end
 
-    it "should call new with it's parameters then save the initialized logling" do
-      @logling.should_receive(:save)
+        @after = @object.attributes.select { |attr| @changes.keys.include?(attr) }
+      end
 
-      @klass.create(@blog_post, @changes)
-    end
-  end
-
-  describe ".parse_changes" do
-    before(:each) do
-      @blog_post = BlogPost.create(:title => "Changeling", :content => "Something about Changeling", :public => false)
-
-      @before = @blog_post.attributes.select { |attr| attr == "content" }
-
-      @blog_post.content = "Content about Changeling"
-
-      @after = @blog_post.attributes.select { |attr| attr == "content" }
-
+      it "should correctly match the before and after states of the object" do
+        @klass.parse_changes(@object.changes).should == [@before, @after]
+      end
     end
 
-    it "should correctly match the before and after states of the object" do
-      @klass.parse_changes(@blog_post.changes).should == [@before, @after]
+    describe ".redis_key" do
+      it "should consist of 3 parts, changeling::model_name::object_id" do
+        @logling.redis_key.should == "changeling::#{@object.class.to_s.underscore.pluralize}::#{@object.id.to_s}"
+      end
+    end
+
+    describe ".save" do
+      before(:each) do
+        @redis = Redis.new(:db => 1)
+        Changeling.stub(:redis).and_return(@redis)
+      end
+
+      it "should generate a key for storing in Redis" do
+        @logling.should_receive(:redis_key)
+        @logling.save
+      end
+
+      it "should serialize the logling" do
+        @logling.should_receive(:serialize)
+        @logling.save
+      end
+
+      it "should push the serialized object into Redis" do
+        @key = 1
+        @value = 2
+        @logling.stub(:redis_key).and_return(@key)
+        @logling.stub(:serialize).and_return(@value)
+        @redis.should_receive(:lpush).with(@key, @value)
+        @logling.save
+      end
+    end
+
+    describe ".serialize" do
+
     end
   end
 end

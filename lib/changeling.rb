@@ -6,4 +6,8 @@ module Changeling
   module Models
     autoload :Logling, 'changeling/models/logling'
   end
+
+  def redis
+    @redis ||= Redis.new
+  end
 end

@@ -1,7 +1,7 @@
 module Changeling
   module Models
     class Logling
-      attr_accessor :klass, :object_id, :before, :after
+      attr_accessor :klass, :object_id, :before, :after, :changed_at
 
       class << self
         def create(object, changes)
@@ -27,9 +27,25 @@ module Changeling
         self.object_id = object.id.to_s
 
         self.before, self.after = Logling.parse_changes(changes)
+
+        self.changed_at = object.updated_at
+      end
+
+      def redis_key
+        "changeling::#{self.klass}::#{self.object_id}"
       end
 
       def save
+        key = self.redis_key
+        value = self.serialize
+
+        Changeling.redis.lpush(key, value)
+      end
+
+      def serialize
+        {
+
+        }
       end
     end
   end
