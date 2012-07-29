@@ -15,12 +15,8 @@ describe Changeling::Models::Logling do
     end
 
     describe ".as_json" do
-      it "should include the object's before attribute" do
-        @logling.should_receive(:before)
-      end
-
-      it "should include the object's after attribute" do
-        @logling.should_receive(:after)
+      it "should include the object's modifications attribute" do
+        @logling.should_receive(:modifications)
       end
 
       it "should include the object's changed_at attribute" do
@@ -57,6 +53,10 @@ describe Changeling::Models::Logling do
 
       it "should set object_id as the stringified object's ID" do
         @logling.object_id.should == @object.id.to_s
+      end
+
+      it "should set the modifications as the incoming changes parameter" do
+        @logling.modifications.should == @changes
       end
 
       it "should set before and after based on .parse_changes" do

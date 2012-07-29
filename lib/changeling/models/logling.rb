@@ -1,7 +1,7 @@
 module Changeling
   module Models
     class Logling
-      attr_accessor :klass, :object_id, :before, :after, :changed_at
+      attr_accessor :klass, :object_id, :modifications, :before, :after, :changed_at
 
       class << self
         def create(object, changes)
@@ -24,8 +24,7 @@ module Changeling
 
       def as_json
         {
-          :before => self.before,
-          :after => self.after,
+          :modifications => self.modifications,
           :changed_at => self.changed_at
         }
       end
@@ -33,6 +32,7 @@ module Changeling
       def initialize(object, changes)
         self.klass = object.class.to_s.underscore.pluralize
         self.object_id = object.id.to_s
+        self.modifications = changes
 
         self.before, self.after = Logling.parse_changes(changes)
 
