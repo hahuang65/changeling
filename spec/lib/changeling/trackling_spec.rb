@@ -33,8 +33,5 @@ describe Changeling::Trackling do
         @object.save!
       end
     end
-
-    describe "instance methods" do
-    end
   end
 end
