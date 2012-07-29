@@ -20,6 +20,24 @@ module Changeling
 
           [before, after]
         end
+
+
+        def redis_key(klass, object_id)
+          "changeling::#{klass}::#{object_id}"
+        end
+
+        def where(args)
+          # args = {
+          #   :klass => object.class.to_s.underscore.pluralize,
+          #   :object_id => object.id.to_s
+          # }
+
+          return [] unless args[:klass] && args[:object_id]
+
+          key = self.redis_key(args[:klass], args[:object_id])
+          length = Changeling.redis.llen(key)
+          Changeling.redis.lrange(key, 0, length)
+        end
       end
 
       def as_json
@@ -40,7 +58,7 @@ module Changeling
       end
 
       def redis_key
-        "changeling::#{self.klass}::#{self.object_id}"
+        Logling.redis_key(self.klass, self.object_id)
       end
 
       def save
