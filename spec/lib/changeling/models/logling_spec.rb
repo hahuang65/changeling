@@ -82,8 +82,7 @@ describe Changeling::Models::Logling do
 
       describe ".records_for" do
         before(:each) do
-          @redis = Redis.new(:db => 1)
-          @klass.stub(:redis).and_return(@redis)
+          @klass.stub(:redis).and_return($redis)
         end
 
         it "should get a redis_key" do
@@ -95,14 +94,14 @@ describe Changeling::Models::Logling do
         it "should find the length of the Redis list" do
           @key = @logling.redis_key
           @klass.stub(:redis_key).and_return(@key)
-          @redis.should_receive(:llen).with(@key)
+          $redis.should_receive(:llen).with(@key)
           @klass.records_for(@object)
         end
 
         it "should not find the length of the Redis list if length option is passed" do
           @key = @logling.redis_key
           @klass.stub(:redis_key).and_return(@key)
-          @redis.should_not_receive(:llen).with(@key)
+          $redis.should_not_receive(:llen).with(@key)
           @klass.records_for(@object, 10)
         end
 
@@ -110,15 +109,15 @@ describe Changeling::Models::Logling do
           @key = @logling.redis_key
           @length = 100
           @klass.stub(:redis_key).and_return(@key)
-          @redis.stub(:llen).and_return(@length)
-          @redis.should_receive(:lrange).with(@key, 0, @length).and_return([])
+          $redis.stub(:llen).and_return(@length)
+          $redis.should_receive(:lrange).with(@key, 0, @length).and_return([])
           @klass.records_for(@object)
         end
 
         it "should find the specified amount of entries in the Redis list if length option is passed" do
           @key = @logling.redis_key
           @klass.stub(:redis_key).and_return(@key)
-          @redis.should_receive(:lrange).with(@key, 0, 5).and_return([])
+          $redis.should_receive(:lrange).with(@key, 0, 5).and_return([])
           @klass.records_for(@object, 5)
         end
       end
@@ -148,8 +147,7 @@ describe Changeling::Models::Logling do
 
       describe ".save" do
         before(:each) do
-          @redis = Redis.new(:db => 1)
-          @klass.stub(:redis).and_return(@redis)
+          @klass.stub(:redis).and_return($redis)
         end
 
         it "should generate a key for storing in Redis" do
@@ -165,7 +163,7 @@ describe Changeling::Models::Logling do
           @value = 2
           @logling.stub(:redis_key).and_return(@key)
           @logling.stub(:serialize).and_return(@value)
-          @redis.should_receive(:lpush).with(@key, @value)
+          $redis.should_receive(:lpush).with(@key, @value)
         end
 
         after(:each) do

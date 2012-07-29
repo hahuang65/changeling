@@ -13,10 +13,11 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner[:mongoid].strategy = :truncation
+    $redis = Redis.new(:db => 1)
   end
 
   config.before(:each) do
-    Redis.new(:db => 1).flushdb
+    $redis.flushdb
     DatabaseCleaner.start
   end
 
