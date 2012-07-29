@@ -80,41 +80,45 @@ describe Changeling::Models::Logling do
         end
       end
 
-      describe ".where" do
+      describe ".records_for" do
         before(:each) do
           @redis = Redis.new(:db => 1)
-          Changeling.stub(:redis).and_return(@redis)
-        end
-
-        it "should return an empty array if no klass is specified" do
-          @klass.should_not_receive(:redis_key)
-          @klass.where(:object_id => @logling.object_id).should == []
-        end
-
-        it "should return an empty array if no object_id is specified" do
-          @klass.should_not_receive(:redis_key)
-          @klass.where(:klass => @logling.klass).should == []
+          @klass.stub(:redis).and_return(@redis)
         end
 
         it "should get a redis_key" do
-          @klass.should_receive(:redis_key).with(@logling.klass, @logling.object_id)
-          @klass.where(:klass => @logling.klass, :object_id => @logling.object_id)
+          @klass.should_receive(:redis_key).with(@logling.klass, @logling.object_id).and_return(@logling.redis_key)
+          @klass.records_for(@object)
         end
 
         it "should find the length of the Redis list" do
           @key = @logling.redis_key
           @klass.stub(:redis_key).and_return(@key)
           @redis.should_receive(:llen).with(@key)
-          @klass.where(:klass => @logling.klass, :object_id => @logling.object_id)
+          @klass.records_for(@object)
+        end
+
+        it "should not find the length of the Redis list if length option is passed" do
+          @key = @logling.redis_key
+          @klass.stub(:redis_key).and_return(@key)
+          @redis.should_not_receive(:llen).with(@key)
+          @klass.records_for(@object, 10)
         end
 
         it "should find all entries in the Redis list" do
           @key = @logling.redis_key
-          @length = 2
+          @length = 100
           @klass.stub(:redis_key).and_return(@key)
           @redis.stub(:llen).and_return(@length)
-          @redis.should_receive(:lrange).with(@key, 0, @length)
-          @klass.where(:klass => @logling.klass, :object_id => @logling.object_id)
+          @redis.should_receive(:lrange).with(@key, 0, @length).and_return([])
+          @klass.records_for(@object)
+        end
+
+        it "should find the specified amount of entries in the Redis list if length option is passed" do
+          @key = @logling.redis_key
+          @klass.stub(:redis_key).and_return(@key)
+          @redis.should_receive(:lrange).with(@key, 0, 5).and_return([])
+          @klass.records_for(@object, 5)
         end
       end
     end
@@ -144,7 +148,7 @@ describe Changeling::Models::Logling do
       describe ".save" do
         before(:each) do
           @redis = Redis.new(:db => 1)
-          Changeling.stub(:redis).and_return(@redis)
+          @klass.stub(:redis).and_return(@redis)
         end
 
         it "should generate a key for storing in Redis" do

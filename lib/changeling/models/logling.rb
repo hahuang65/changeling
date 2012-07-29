@@ -21,22 +21,24 @@ module Changeling
           [before, after]
         end
 
+        def redis
+          @redis ||= Redis.new
+        end
 
         def redis_key(klass, object_id)
           "changeling::#{klass}::#{object_id}"
         end
 
-        def where(args)
-          # args = {
-          #   :klass => object.class.to_s.underscore.pluralize,
-          #   :object_id => object.id.to_s
-          # }
+        def records_for(object, length = nil)
+          key = self.redis_key(object.class.to_s.underscore.pluralize, object.id.to_s)
+          length ||= self.redis.llen(key)
 
-          return [] unless args[:klass] && args[:object_id]
-
-          key = self.redis_key(args[:klass], args[:object_id])
-          length = Changeling.redis.llen(key)
-          Changeling.redis.lrange(key, 0, length)
+          results = self.redis.lrange(key, 0, length)
+          if results.any?
+            results.map { |value| self.new(object, JSON.parse(value)) }
+          else
+            []
+          end
         end
       end
 
@@ -65,7 +67,7 @@ module Changeling
         key = self.redis_key
         value = self.serialize
 
-        Changeling.redis.lpush(key, value)
+        Logling.redis.lpush(key, value)
       end
 
       def serialize
