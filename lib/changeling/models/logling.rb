@@ -33,12 +33,7 @@ module Changeling
           key = self.redis_key(object.class.to_s.underscore.pluralize, object.id.to_s)
           length ||= self.redis.llen(key)
 
-          results = self.redis.lrange(key, 0, length)
-          if results.any?
-            results.map { |value| self.new(object, JSON.parse(value)) }
-          else
-            []
-          end
+          results = self.redis.lrange(key, 0, length).map { |value| self.new(object, JSON.parse(value)) }
         end
       end
 

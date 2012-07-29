@@ -87,7 +87,8 @@ describe Changeling::Models::Logling do
         end
 
         it "should get a redis_key" do
-          @klass.should_receive(:redis_key).with(@logling.klass, @logling.object_id).and_return(@logling.redis_key)
+          @key = @logling.redis_key
+          @klass.should_receive(:redis_key).with(@logling.klass, @logling.object_id).and_return(@key)
           @klass.records_for(@object)
         end
 

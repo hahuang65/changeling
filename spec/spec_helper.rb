@@ -16,6 +16,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    Redis.new(:db => 1).flushdb
     DatabaseCleaner.start
   end
 
