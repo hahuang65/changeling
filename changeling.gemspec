@@ -19,8 +19,14 @@ Gem::Specification.new do |gem|
   gem.add_dependency "redis"
 
   # Development Dependencies
-  gem.add_development_dependency "mongoid", "2.4.1"
-  gem.add_development_dependency "activerecord", "3.1.3"
+  case RUBY_VERSION
+  when "1.9.2"
+    gem.add_development_dependency "mongoid", "2.4.1"
+    gem.add_development_dependency "activerecord", "3.1.3"
+  when "1.9.3"
+    gem.add_development_dependency "mongoid", "3.0.3"
+    gem.add_development_dependency "activerecord", "3.2.7"
+  end
   gem.add_development_dependency "bson_ext"
   gem.add_development_dependency "database_cleaner"
 end
