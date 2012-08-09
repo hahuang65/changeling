@@ -12,6 +12,7 @@ if defined?(Mongoid::VERSION)
   Mongoid.load!(File.dirname(__FILE__) + "/config/mongoid.yml", :test)
 else
   # Mongoid 2.4.1
+  # Didn't use Mongoid.load! here since 2.4.1 doesn't allow passing in an environment to use.
   Mongoid.database = Mongo::Connection.new('localhost','27017').db('changeling_test')
 end
 
@@ -36,6 +37,18 @@ end
 def models
   @models = {
     BlogPost => {
+      :options => {
+        :title => "Changeling",
+        :content => "Something about Changeling",
+        :public => false
+      },
+      :changes => {
+        "public" => [false, true],
+        "content" => ["Something about Changeling", "Content about Changeling"]
+      }
+    },
+
+    BlogPostNoTimestamp => {
       :options => {
         :title => "Changeling",
         :content => "Something about Changeling",

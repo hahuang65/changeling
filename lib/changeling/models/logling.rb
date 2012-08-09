@@ -51,7 +51,11 @@ module Changeling
 
         self.before, self.after = Logling.parse_changes(changes)
 
-        self.changed_at = object.updated_at
+        if object.respond_to?(:updated_at)
+          self.changed_at = object.updated_at
+        else
+          self.changed_at = Time.now
+        end
       end
 
       def redis_key

@@ -7,6 +7,8 @@ describe Changeling::Models::Logling do
 
   # .models is defined in spec_helper.
   models.each_pair do |model, args|
+    puts "Testing #{model} now."
+
     before(:each) do
       @object = model.new(args[:options])
       @changes = args[:changes]
@@ -51,8 +53,28 @@ describe Changeling::Models::Logling do
           @logling.after.should == @after
         end
 
-        it "should set changed_at to the object's time of update" do
+        it "should set changed_at to the object's time of update if the object responds to the updated_at method" do
+          @object.should_receive(:respond_to?).with(:updated_at).and_return(true)
+
+          # Setting up a variable to prevent test flakiness from passing time.
+          time = Time.now
+          @object.stub(:updated_at).and_return(time)
+
+          # Create a new logling to trigger the initialize method
+          @logling = @klass.new(@object, @changes)
           @logling.changed_at.should == @object.updated_at
+        end
+
+        it "should set changed_at to the current time if the object doesn't respond to updated_at" do
+          @object.should_receive(:respond_to?).with(:updated_at).and_return(false)
+
+          # Setting up a variable to prevent test flakiness from passing time.
+          time = Time.now
+          Time.stub(:now).and_return(time)
+
+          # Create a new logling to trigger the initialize method
+          @logling = @klass.new(@object, @changes)
+          @logling.changed_at.should == time
         end
       end
 
