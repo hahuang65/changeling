@@ -1,2 +1,2 @@
 rvm use 1.9.2-p290@changeling --create
-# rvm use 1.9.3-p194@changeling --create
+rvm use 1.9.3-p0@changeling --create
