@@ -1,3 +1,5 @@
+require 'rubygems'
+require 'redis'
 require "changeling/version"
 
 module Changeling
