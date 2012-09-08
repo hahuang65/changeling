@@ -33,7 +33,7 @@ module Changeling
           key = self.redis_key(object.class.to_s.underscore.pluralize, object.id.to_s)
           length ||= self.redis.llen(key)
 
-          results = self.redis.lrange(key, 0, length).map { |value| self.new(object, JSON.parse(value)) }
+          results = self.redis.lrange(key, 0, length).map { |value| self.new(object, JSON.parse(value)['modifications']) }
         end
       end
 
@@ -45,6 +45,9 @@ module Changeling
       end
 
       def initialize(object, changes)
+        # Remove updated_at field.
+        changes.delete("updated_at")
+
         self.klass = object.class.to_s.underscore.pluralize
         self.object_id = object.id.to_s
         self.modifications = changes
