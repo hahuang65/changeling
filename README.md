@@ -9,7 +9,7 @@ A flexible and lightweight object change tracking system.
 ## Installation
 
 Add this line to your application's Gemfile:
-    
+
 ```ruby
 gem 'changeling'
 ```
@@ -85,6 +85,8 @@ Access all of an objects history:
 Properties of Loglings (history objects):
 
 ```ruby
+log = @post.history.first
+
 log.klass # class of the object that the Logling is tracking.
 => "posts"
 
