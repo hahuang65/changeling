@@ -37,6 +37,8 @@ Include the Trackling module for any class you want to keep track of:
 ```ruby
 class Post
   include Changeling::Trackling
+
+  # Model logic here...
 end
 ```
 
@@ -59,6 +61,8 @@ If you wish to see what has been logged, include the Probeling module:
 class Post
   include Changeling::Trackling
   include Changeling::Probeling
+
+  # Model logic here...
 end
 ```
 
