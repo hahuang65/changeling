@@ -28,6 +28,7 @@ Gem::Specification.new do |gem|
     gem.add_development_dependency "activerecord", "3.2.7"
   end
   gem.add_development_dependency "rake"
+  gem.add_development_dependency "rspec"
   gem.add_development_dependency "bson_ext"
   gem.add_development_dependency "database_cleaner"
 end
