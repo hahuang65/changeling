@@ -34,8 +34,71 @@ $ gem install changeling
 
 Include the Trackling module for any class you want to keep track of:
 
-```ruby    
-include Changeling::Trackling
+```ruby
+class Post
+  include Changeling::Trackling
+end
+```
+
+That's it! Including the module will silently keep track of any changes made to objects of this class.
+For example:
+
+```ruby
+@post = Post.first
+@post.title
+=> 'Old Title'
+@post.tile = 'New Title'
+@post.save
+```
+
+This code will save a history that represents that the title for this post has been changed.
+
+If you wish to see what has been logged, include the Probeling module:
+
+```ruby
+class Post
+  include Changeling::Trackling
+  include Changeling::Probeling
+end
+```
+
+With Probeling, you can check out the changes that have been made! They're stored in the order that the changes are made.
+You can access the up to the last 10 changes simply by calling
+
+```ruby
+@post.history
+```
+
+You can access a different number of records by passing in a number to the .history method:
+
+```ruby
+@post.history(50)
+# Will automatically handle if there are less than the number of histories requested.
+```
+
+Access all of an objects history:
+
+```ruby
+@post.all_history
+```
+
+Properties of Loglings (history objects):
+
+```ruby
+log.klass # class of the object that the Logling is tracking.
+=> "posts"
+log.object_id # the ID of the object that the Logling is tracking.
+=> "1"
+log.before # what the before state of the object was.
+=> {"title" => "Old Title"}
+log.after # what the after state of the object is.
+=> {"title" => "New Title"}
+log.modifications # what changes were made to the object that this Logling recorded. Basically a roll up of the .before and .after methods.
+=> {"title" => ["Old Title", "New Title"]}
+log.changed_at # what time these changes were made.
+=> Sat, 08 Sep 2012 10:21:46 UTC +00:00
+log.as_json # JSON representation of the changes.
+=> {:modifications=>{"title" => ["Old Title", "New Title"], :changed_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
 ```
 
 ## Testing
