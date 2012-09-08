@@ -4,26 +4,27 @@
 [travis-link]: http://travis-ci.org/hahuang65/Changeling
 [travis-home]: http://travis-ci.org/
 
-
 A flexible and lightweight object change tracking system.
-
-## How It Works
-
-
 
 ## Installation
 
 Add this line to your application's Gemfile:
-
-    gem 'changeling'
+    
+```ruby
+gem 'changeling'
+```
 
 And then execute:
 
-    $ bundle
+```sh
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install changeling
+```sh
+$ gem install changeling
+```
 
 ## Requirements
 
@@ -31,7 +32,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Include the Trackling module for any class you want to keep track of:
+
+```ruby    
+include Changeling::Trackling
+```
 
 ## Testing
 
