@@ -132,4 +132,8 @@ against the following interpreters (with corresponding ORM/ODMs) and datastores:
 
 ## TODO
 
-* Many many things.
+* Restore state from a Logling
+* Use Mongo / SQL as a datastore rather than Redis (not sure about this one yet.)
+* Sinatra app to monitor changes as they happen in real-time
+* Analytics for changes
+* Much more...
