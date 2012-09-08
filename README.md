@@ -47,7 +47,7 @@ For example:
 @post = Post.first
 @post.title
 => 'Old Title'
-@post.tile = 'New Title'
+@post.title = 'New Title'
 @post.save
 ```
 
@@ -72,8 +72,8 @@ You can access the up to the last 10 changes simply by calling
 You can access a different number of records by passing in a number to the .history method:
 
 ```ruby
-@post.history(50)
 # Will automatically handle if there are less than the number of histories requested.
+@post.history(50)
 ```
 
 Access all of an objects history:
@@ -87,16 +87,22 @@ Properties of Loglings (history objects):
 ```ruby
 log.klass # class of the object that the Logling is tracking.
 => "posts"
+
 log.object_id # the ID of the object that the Logling is tracking.
 => "1"
+
 log.before # what the before state of the object was.
 => {"title" => "Old Title"}
+
 log.after # what the after state of the object is.
 => {"title" => "New Title"}
+
 log.modifications # what changes were made to the object that this Logling recorded. Basically a roll up of the .before and .after methods.
 => {"title" => ["Old Title", "New Title"]}
+
 log.changed_at # what time these changes were made.
 => Sat, 08 Sep 2012 10:21:46 UTC +00:00
+
 log.as_json # JSON representation of the changes.
 => {:modifications=>{"title" => ["Old Title", "New Title"], :changed_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
 ```
