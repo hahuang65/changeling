@@ -1,6 +1,5 @@
 require(File.expand_path('../../lib/changeling', __FILE__))
 require 'mongoid'
-require 'redis'
 require 'database_cleaner'
 
 # Fixtures
@@ -21,16 +20,30 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner[:mongoid].strategy = :truncation
-    $redis = Redis.new(:db => 1)
+    Tire::Model::Search.index_prefix "Changeling_Test"
   end
 
   config.before(:each) do
-    $redis.flushdb
     DatabaseCleaner.start
+    clear_tire_indexes
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
+  end
+end
+
+# Inspiration from http://stackoverflow.com/questions/9676089/how-to-test-elasticsearch-in-a-rails-application-rspec
+def clear_tire_indexes
+  [Changeling::Models::Logling].each do |model|
+    # Make sure that the current model is using Tire
+    if model.respond_to?(:tire)
+      # Delete the index for the model.
+      model.tire.index.delete
+
+      # Reload the model's index so that it can be used again.
+      load File.expand_path("../../lib/changeling/models/#{model.name.split('::').last.downcase}.rb", __FILE__)
+    end
   end
 end
 

@@ -36,12 +36,12 @@ describe Changeling::Models::Logling do
           @before, @after = @klass.parse_changes(@changes)
         end
 
-        it "should set klass as the pluralized version of the class name" do
-          @logling.klass.should == @object.class.to_s.underscore.pluralize
+        it "should set klass as the .klassify-ed value" do
+          @logling.klass.should == @klass.klassify(@object)
         end
 
-        it "should set object_id as the stringified object's ID" do
-          @logling.object_id.should == @object.id.to_s
+        it "should set oid as the stringified object's ID" do
+          @logling.oid.should == @object.id.to_s
         end
 
         it "should set the modifications as the incoming changes parameter" do
@@ -96,23 +96,13 @@ describe Changeling::Models::Logling do
         end
       end
 
-      describe ".redis_key" do
-        it "should consist of 3 parts, changeling::model_name::object_id" do
-          @klass.redis_key(@logling.klass, @logling.object_id).should == "changeling::#{@object.class.to_s.underscore.pluralize}::#{@object.id.to_s}"
+      describe ".klassify" do
+        it "should return the underscored version of the objects class as a string" do
+          @klass.klassify(@object).should == @object.class.to_s.underscore
         end
       end
 
       describe ".records_for" do
-        before(:each) do
-          @klass.stub(:redis).and_return($redis)
-        end
-
-        it "should get a redis_key" do
-          @key = @logling.redis_key
-          @klass.should_receive(:redis_key).with(@logling.klass, @logling.object_id).and_return(@key)
-          @klass.records_for(@object)
-        end
-
         it "should find the length of the Redis list" do
           @key = @logling.redis_key
           @klass.stub(:redis_key).and_return(@key)
@@ -146,7 +136,15 @@ describe Changeling::Models::Logling do
     end
 
     context "Instance Methods" do
-      describe ".as_json" do
+      describe ".to_indexed_json" do
+        it "should include the object's klass attribute" do
+          @logling.should_receive(:klass)
+        end
+
+        it "should include the object's oid attribute" do
+          @logling.should_receive(:oid)
+        end
+
         it "should include the object's modifications attribute" do
           @logling.should_receive(:modifications)
         end
@@ -156,46 +154,17 @@ describe Changeling::Models::Logling do
         end
 
         after(:each) do
-          @logling.as_json
-        end
-      end
-
-      describe ".redis_key" do
-        it "should pass in it's klass and object_id" do
-          @klass.should_receive(:redis_key).with(@logling.klass, @logling.object_id)
-          @logling.redis_key
+          @logling.to_indexed_json
         end
       end
 
       describe ".save" do
-        before(:each) do
-          @klass.stub(:redis).and_return($redis)
-        end
-
-        it "should generate a key for storing in Redis" do
-          @logling.should_receive(:redis_key)
-        end
-
-        it "should serialize the logling" do
-          @logling.should_receive(:serialize)
-        end
-
-        it "should push the serialized object into Redis" do
-          @key = 1
-          @value = 2
-          @logling.stub(:redis_key).and_return(@key)
-          @logling.stub(:serialize).and_return(@value)
-          $redis.should_receive(:lpush).with(@key, @value)
+        it "should update the ElasticSearch index" do
+          @logling.should_receive(:update_elasticsearch_index)
         end
 
         after(:each) do
           @logling.save
-        end
-      end
-
-      describe ".serialize" do
-        it "should JSON-ify the as_json object" do
-          @logling.serialize.should == @logling.as_json.to_json
         end
       end
     end

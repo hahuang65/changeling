@@ -16,16 +16,18 @@ Gem::Specification.new do |gem|
   gem.version       = Changeling::VERSION
 
   # Dependencies
-  gem.add_dependency "redis"
+  gem.add_dependency "tire"
 
   # Development Dependencies
   case RUBY_VERSION
   when "1.9.2"
     gem.add_development_dependency "mongoid", "2.4.1"
     gem.add_development_dependency "activerecord", "3.1.3"
+    gem.add_development_dependency "ruby-debug19"
   when "1.9.3"
     gem.add_development_dependency "mongoid", "3.0.3"
     gem.add_development_dependency "activerecord", "3.2.7"
+    gem.add_development_dependency "debugger"
   end
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"

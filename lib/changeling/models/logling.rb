@@ -1,7 +1,11 @@
 module Changeling
   module Models
     class Logling
-      attr_accessor :klass, :object_id, :modifications, :before, :after, :changed_at
+      include Tire::Model::Search
+      attr_accessor :klass, :oid, :modifications, :before, :after, :changed_at
+
+      # For Tire to name the index
+      index_name 'Loglings'
 
       class << self
         def create(object, changes)
@@ -21,24 +25,30 @@ module Changeling
           [before, after]
         end
 
-        def redis
-          @redis ||= Redis.new
+        def klassify(object)
+          object.class.to_s.underscore
         end
 
-        def redis_key(klass, object_id)
-          "changeling::#{klass}::#{object_id}"
-        end
+        def records_for(object)
+          klass = self.klassify(object)
+          id = self.id.to_s
 
-        def records_for(object, length = nil)
-          key = self.redis_key(object.class.to_s.underscore.pluralize, object.id.to_s)
-          length ||= self.redis.llen(key)
+          results = self.tire.search do
+            query do
 
-          results = self.redis.lrange(key, 0, length).map { |value| self.new(object, JSON.parse(value)['modifications']) }
+            end
+
+            sort { by :changed_at, 'desc' }
+          end
+
+          results.map { |value| self.new(object, JSON.parse(value)['modifications']) }
         end
       end
 
-      def as_json
+      def to_indexed_json
         {
+          :klass => self.klass,
+          :oid => self.oid,
           :modifications => self.modifications,
           :changed_at => self.changed_at
         }
@@ -48,8 +58,8 @@ module Changeling
         # Remove updated_at field.
         changes.delete("updated_at")
 
-        self.klass = object.class.to_s.underscore.pluralize
-        self.object_id = object.id.to_s
+        self.klass = Logling.klassify(object)
+        self.oid = object.id.to_s
         self.modifications = changes
 
         self.before, self.after = Logling.parse_changes(changes)
@@ -61,19 +71,8 @@ module Changeling
         end
       end
 
-      def redis_key
-        Logling.redis_key(self.klass, self.object_id)
-      end
-
       def save
-        key = self.redis_key
-        value = self.serialize
-
-        Logling.redis.lpush(key, value)
-      end
-
-      def serialize
-        self.as_json.to_json
+        self.update_elastic_search_index
       end
     end
   end
