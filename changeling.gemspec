@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
 
   # Dependencies
   gem.add_dependency "tire"
+  gem.add_dependency "activemodel"
 
   # Development Dependencies
   case RUBY_VERSION

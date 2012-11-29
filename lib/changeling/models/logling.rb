@@ -1,11 +1,9 @@
 module Changeling
   module Models
     class Logling
+      extend ActiveModel::Naming
       include Tire::Model::Search
       attr_accessor :klass, :oid, :modifications, :before, :after, :changed_at
-
-      # For Tire to name the index
-      index_name 'Loglings'
 
       class << self
         def create(object, changes)
@@ -49,7 +47,7 @@ module Changeling
         {
           :klass => self.klass,
           :oid => self.oid,
-          :modifications => self.modifications,
+          :modifications => self.modifications.to_json,
           :changed_at => self.changed_at
         }
       end
