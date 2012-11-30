@@ -139,7 +139,8 @@ against the following interpreters (with corresponding ORM/ODMs) and datastores:
 ## TODO
 
 * Restore state from a Logling
-* Use Mongo / SQL as a datastore rather than Redis (not sure about this one yet.)
-* Sinatra app to monitor changes as they happen in real-time
-* Analytics for changes
+* Filter Loglings by which fields have changed.
+* Performance testing against large data loads.
+* Sinatra app to monitor changes as they happen in real-time.
+* Analytics for changes.
 * Much more...
