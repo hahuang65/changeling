@@ -94,7 +94,7 @@ log = @post.history.first
 log.klass # class of the object that the Logling is tracking.
 => "posts"
 
-log.object_id # the ID of the object that the Logling is tracking.
+log.oid # the ID of the object that the Logling is tracking.
 => "1"
 
 log.before # what the before state of the object was.
@@ -106,11 +106,11 @@ log.after # what the after state of the object is.
 log.modifications # what changes were made to the object that this Logling recorded. Basically a roll up of the .before and .after methods.
 => {"title" => ["Old Title", "New Title"]}
 
-log.changed_at # what time these changes were made.
+log.modified_at # what time these changes were made.
 => Sat, 08 Sep 2012 10:21:46 UTC +00:00
 
 log.as_json # JSON representation of the changes.
-=> {:modifications=>{"title" => ["Old Title", "New Title"], :changed_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
+=> {:modifications=>{"title" => ["Old Title", "New Title"], :modified_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
 ```
 
 ## Testing

@@ -16,7 +16,8 @@ Gem::Specification.new do |gem|
   gem.version       = Changeling::VERSION
 
   # Dependencies
-  gem.add_dependency "redis"
+  gem.add_dependency "tire"
+  gem.add_dependency "activemodel"
 
   # Development Dependencies
   case RUBY_VERSION
