@@ -3,6 +3,8 @@
 [travis-image]: https://secure.travis-ci.org/hahuang65/Changeling.png?branch=master
 [travis-link]: http://travis-ci.org/hahuang65/Changeling
 [travis-home]: http://travis-ci.org/
+[brew-home]: http://mxcl.github.com/homebrew/
+[elasticsearch-home]: http://www.elasticsearch.org
 
 A flexible and lightweight object change tracking system.
 
@@ -28,7 +30,11 @@ $ gem install changeling
 
 ## Requirements
 
-* Redis (Tested on 2.4.x)
+* [ElasticSearch][elasticsearch-home] (Tested on 0.19.9 with JVM 20.10-b01-428)
+    * Install via [Homebrew][brew-home]
+    ```sh
+    $ brew install elasticsearch
+    ```
 
 ## Usage
 
@@ -120,7 +126,7 @@ against the following interpreters (with corresponding ORM/ODMs) and datastores:
 
 * MRI 1.9.2 (Mongoid 2.4.1, ActiveRecord 3.1.3)
 * MRI 1.9.3 (Mongoid 3.0.3, ActiveRecord 3.2.7)
-* Redis 2.4.x
+* ElasticSearch (Tested on 0.19.9 with JVM 20.10-b01-428)
 
 ## Contributing
 
