@@ -22,7 +22,7 @@ describe Changeling::Probeling do
   end
 
   describe ".all_history" do
-    it "should query Logling with it's pluralized class name, and it's own ID" do
+    it "should query Logling with it's class name, and it's own ID" do
       @klass.should_receive(:records_for).with(@object)
       @object.all_history
     end
@@ -33,7 +33,7 @@ describe Changeling::Probeling do
   end
 
   describe ".history" do
-    it "should query Logling with it's pluralized class name, and it's own ID, and a default number of loglings to return" do
+    it "should query Logling with it's class name, and it's own ID, and a default number of loglings to return" do
       @klass.should_receive(:records_for).with(@object, 10)
       @object.history
     end

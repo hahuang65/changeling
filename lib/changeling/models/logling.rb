@@ -38,17 +38,16 @@ module Changeling
         end
 
         def klassify(object)
-          object.class.to_s.underscore
+          object.class
         end
 
         def records_for(object, length = nil)
           self.tire.index.refresh
-
           results = self.search do
            query do
              filtered do
                query { all }
-               filter :terms, :klass => [Logling.klassify(object)]
+               filter :terms, :klass => [Logling.klassify(object).to_s.underscore]
                filter :terms, :oid => [object.id.to_s]
              end
            end
@@ -66,18 +65,27 @@ module Changeling
 
       def to_indexed_json
         {
-          :klass => self.klass,
-          :oid => self.oid,
+          :klass => self.klass.to_s.underscore,
+          :oid => self.oid.to_s,
           :modifications => self.modifications.to_json,
           :modified_at => self.modified_at
         }.to_json
       end
 
+      def as_json
+        {
+          :class => self.klass,
+          :oid => self.oid,
+          :modifications => self.modifications,
+          :modified_at => self.modified_at
+        }
+      end
+
       def initialize(object)
         if object.class == Hash
           changes = JSON.parse(object['modifications'])
-          self.klass = object['klass']
-          self.oid = object['oid']
+          self.klass = object['klass'].camelize.constantize
+          self.oid = object['oid'].to_i.to_s == object['oid'] ? object['oid'].to_i : object['oid']
           self.modifications = changes
 
           self.before, self.after = Logling.parse_changes(changes)
@@ -90,7 +98,7 @@ module Changeling
           changes.delete("updated_at")
 
           self.klass = Logling.klassify(object)
-          self.oid = object.id.to_s
+          self.oid = object.id
           self.modifications = changes
 
           self.before, self.after = Logling.parse_changes(changes)

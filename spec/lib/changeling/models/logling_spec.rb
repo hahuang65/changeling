@@ -35,7 +35,7 @@ describe Changeling::Models::Logling do
         context "when passed object is a ElasticSearch response hash" do
           before(:each) do
             @object = {
-              "klass"=>"blog_post",
+              "klass"=>"BlogPost",
               "oid"=>"50b8355f7a93d04908000001",
               "modifications"=>"{\"public\":[true,false]}",
               "modified_at"=>"2012-11-29T20:26:07-08:00",
@@ -56,11 +56,16 @@ describe Changeling::Models::Logling do
           end
 
           it "should set klass as the returned klass value" do
-            @logling.klass.should == @object['klass']
+            @logling.klass.should == @object['klass'].constantize
           end
 
           it "should set oid as the returned oid value" do
             @logling.oid.should == @object['oid']
+          end
+
+          it "should convert oid to an integer if it's supposed to be an integer" do
+            @object["oid"] = "1"
+            @klass.new(@object).oid.should == @object["oid"].to_i
           end
 
           it "should set the modifications as the incoming changes parameter" do
@@ -86,8 +91,8 @@ describe Changeling::Models::Logling do
             @logling.klass.should == @klass.klassify(@object)
           end
 
-          it "should set oid as the stringified object's ID" do
-            @logling.oid.should == @object.id.to_s
+          it "should set oid as the object's ID" do
+            @logling.oid.should == @object.id
           end
 
           it "should set the modifications as the incoming changes parameter" do
@@ -144,8 +149,8 @@ describe Changeling::Models::Logling do
       end
 
       describe ".klassify" do
-        it "should return the underscored version of the objects class as a string" do
-          @klass.klassify(@object).should == @object.class.to_s.underscore
+        it "should return the object's class" do
+          @klass.klassify(@object).should == @object.class
         end
       end
 
@@ -197,6 +202,32 @@ describe Changeling::Models::Logling do
 
         it "should include the object's modified_at attribute" do
           @logling.should_receive(:modified_at)
+        end
+
+        after(:each) do
+          @logling.to_indexed_json
+        end
+      end
+
+      describe ".as_json" do
+        before(:each) do
+          @json = @logling.as_json
+        end
+
+        it "should include the object's klass attribute" do
+          @json[:class].should == @klass.klassify(@object)
+        end
+
+        it "should include the object's oid attribute" do
+          @json[:oid].should == @object.id
+        end
+
+        it "should include the object's modifications attribute" do
+          @json[:modifications].should == @changes
+        end
+
+        it "should include the object's modified_at attribute" do
+          @json[:modified_at].should == @logling.modified_at
         end
 
         after(:each) do

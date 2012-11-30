@@ -99,10 +99,11 @@ Properties of Loglings (history objects):
 log = @post.history.first
 
 log.klass # class of the object that the Logling is tracking.
-=> "posts"
+=> Post
 
 log.oid # the ID of the object that the Logling is tracking.
-=> "1"
+# Note: integer type IDs will be integers. Non-integer types (such as Mongo's IDs) will be represented as a string
+=> 1
 
 log.before # what the before state of the object was.
 => {"title" => "Old Title"}
@@ -117,7 +118,7 @@ log.modified_at # what time these changes were made.
 => Sat, 08 Sep 2012 10:21:46 UTC +00:00
 
 log.as_json # JSON representation of the changes.
-=> {:modifications=>{"title" => ["Old Title", "New Title"], :modified_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
+=> {:class => Post, :oid => 1, :modifications=> { "title" => ["Old Title", "New Title"] }, :modified_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
 ```
 
 ## Testing
