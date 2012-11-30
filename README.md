@@ -32,7 +32,8 @@ $ gem install changeling
 
 * [ElasticSearch][elasticsearch-home] (Tested on 0.19.9 with JVM 20.10-b01-428)
     * Install via [Homebrew][brew-home]
-    ```sh
+    
+    * ```sh
     $ brew install elasticsearch
     ```
 
