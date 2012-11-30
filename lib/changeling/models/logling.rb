@@ -2,13 +2,9 @@ module Changeling
   module Models
     class Logling
       extend ActiveModel::Naming
-      extend ActiveModel::Callbacks
-      define_model_callbacks :save
-
       attr_accessor :klass, :oid, :modifications, :before, :after, :modified_at
 
       include Tire::Model::Search
-      include Tire::Model::Callbacks
       include Tire::Model::Persistence
 
       property :klass, :type => 'string'
@@ -47,7 +43,8 @@ module Changeling
 
         def records_for(object, length = nil)
           self.tire.index.refresh
-          search = self.search do
+
+          results = self.search do
            query do
              filtered do
                query { all }
@@ -57,9 +54,13 @@ module Changeling
            end
 
            sort { by :modified_at, "desc" }
-          end
+          end.results
 
-          search.results
+          if length
+            results.take(length)
+          else
+            results
+          end
         end
       end
 

@@ -48,6 +48,11 @@ describe Changeling::Probeling do
       @object.history("5")
     end
 
+    it "should only return the amount of loglings requested" do
+      @object.all_history.count.should == 4
+      @object.history(2).count.should == 2
+    end
+
     it "should not error out if the record count desired is more than the total number of loglings" do
       @object.history(20).count.should == 4
     end

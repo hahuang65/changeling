@@ -150,7 +150,28 @@ describe Changeling::Models::Logling do
       end
 
       describe ".records_for" do
+        before(:each) do
+          @index = @klass.tire.index
+          @results = []
+          @klass.stub_chain(:tire, :index).and_return(@index)
+          @klass.stub_chain(:search, :results).and_return(@results)
+        end
 
+        it "should refresh the ElasticSearch index" do
+          @index.should_receive(:refresh)
+          @klass.records_for(@object)
+        end
+
+        it "should only return the amount specified" do
+          num = 5
+          @results.should_receive(:take).with(num)
+          @klass.records_for(@object, 5)
+        end
+
+        it "should return all if no amount is specified" do
+          @results.should_not_receive(:take)
+          @klass.records_for(@object)
+        end
       end
     end
 
