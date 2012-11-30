@@ -3,7 +3,7 @@ require 'tire'
 require "changeling/version"
 
 module Changeling
-  Tire::Model::Search.index_prefix "Changeling"
+  Tire::Model::Search.index_prefix "changeling"
 
   autoload :Trackling, 'changeling/trackling'
   autoload :Probeling, 'changeling/probeling'
