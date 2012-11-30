@@ -20,7 +20,7 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner[:mongoid].strategy = :truncation
-    Tire::Model::Search.index_prefix "Changeling_Test"
+    Tire::Model::Search.index_prefix "changeling_test"
   end
 
   config.before(:each) do
@@ -42,7 +42,7 @@ def clear_tire_indexes
       model.tire.index.delete
 
       # Reload the model's index so that it can be used again.
-      load File.expand_path("../../lib/changeling/models/#{model.name.split('::').last.downcase}.rb", __FILE__)
+      model.tire.create_elasticsearch_index
     end
   end
 end

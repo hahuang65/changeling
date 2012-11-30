@@ -2,12 +2,30 @@ module Changeling
   module Models
     class Logling
       extend ActiveModel::Naming
+      extend ActiveModel::Callbacks
+      define_model_callbacks :save
+
+      attr_accessor :klass, :oid, :modifications, :before, :after, :modified_at
+
       include Tire::Model::Search
-      attr_accessor :klass, :oid, :modifications, :before, :after, :changed_at
+      include Tire::Model::Callbacks
+      include Tire::Model::Persistence
+
+      property :klass, :type => 'string'
+      property :oid, :type => 'string'
+      property :modifications, :type => 'string'
+      property :modified_at, :type => 'date'
+
+      mapping do
+        indexes :klass, :type => "string"
+        indexes :oid, :type => "string"
+        indexes :modifications, :type => 'string'
+        indexes :modified_at, :type => 'date'
+      end
 
       class << self
-        def create(object, changes)
-          logling = self.new(object, changes)
+        def create(object)
+          logling = self.new(object)
           logling.save
         end
 
@@ -27,19 +45,21 @@ module Changeling
           object.class.to_s.underscore
         end
 
-        def records_for(object)
-          klass = self.klassify(object)
-          id = self.id.to_s
+        def records_for(object, length = nil)
+          self.tire.index.refresh
+          search = self.search do
+           query do
+             filtered do
+               query { all }
+               filter :terms, :klass => [Logling.klassify(object)]
+               filter :terms, :oid => [object.id.to_s]
+             end
+           end
 
-          results = self.tire.search do
-            query do
-
-            end
-
-            sort { by :changed_at, 'desc' }
+           sort { by :modified_at, "desc" }
           end
 
-          results.map { |value| self.new(object, JSON.parse(value)['modifications']) }
+          search.results
         end
       end
 
@@ -48,29 +68,42 @@ module Changeling
           :klass => self.klass,
           :oid => self.oid,
           :modifications => self.modifications.to_json,
-          :changed_at => self.changed_at
-        }
+          :modified_at => self.modified_at
+        }.to_json
       end
 
-      def initialize(object, changes)
-        # Remove updated_at field.
-        changes.delete("updated_at")
+      def initialize(object)
+        if object.class == Hash
+          changes = JSON.parse(object['modifications'])
+          self.klass = object['klass']
+          self.oid = object['oid']
+          self.modifications = changes
 
-        self.klass = Logling.klassify(object)
-        self.oid = object.id.to_s
-        self.modifications = changes
+          self.before, self.after = Logling.parse_changes(changes)
 
-        self.before, self.after = Logling.parse_changes(changes)
-
-        if object.respond_to?(:updated_at)
-          self.changed_at = object.updated_at
+          self.modified_at = DateTime.parse(object['modified_at'])
         else
-          self.changed_at = Time.now
+          changes = object.changes
+
+          # Remove updated_at field.
+          changes.delete("updated_at")
+
+          self.klass = Logling.klassify(object)
+          self.oid = object.id.to_s
+          self.modifications = changes
+
+          self.before, self.after = Logling.parse_changes(changes)
+
+          if object.respond_to?(:updated_at)
+            self.modified_at = object.updated_at
+          else
+            self.modified_at = Time.now
+          end
         end
       end
 
       def save
-        self.update_elastic_search_index
+        _run_save_callbacks {}
       end
     end
   end

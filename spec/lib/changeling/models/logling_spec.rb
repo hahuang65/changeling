@@ -13,68 +13,115 @@ describe Changeling::Models::Logling do
       @object = model.new(args[:options])
       @changes = args[:changes]
 
-      @logling = @klass.new(@object, @changes)
+      @object.stub(:changes).and_return(@changes)
+      @logling = @klass.new(@object)
     end
 
     context "Class Methods" do
       describe ".create" do
         before(:each) do
-          @object.stub(:changes).and_return(@changes)
 
-          @klass.should_receive(:new).with(@object, @changes).and_return(@logling)
+          @klass.should_receive(:new).with(@object).and_return(@logling)
         end
 
         it "should call new with it's parameters then save the initialized logling" do
           @logling.should_receive(:save)
 
-          @klass.create(@object, @changes)
+          @klass.create(@object)
         end
       end
 
       describe ".new" do
-        before(:each) do
-          @before, @after = @klass.parse_changes(@changes)
+        context "when passed object is a ElasticSearch response hash" do
+          before(:each) do
+            @object = {
+              "klass"=>"blog_post",
+              "oid"=>"50b8355f7a93d04908000001",
+              "modifications"=>"{\"public\":[true,false]}",
+              "modified_at"=>"2012-11-29T20:26:07-08:00",
+              "id"=>"UU2YGr1WSbilNUlyM1ja8g",
+              "_score"=>nil,
+              "_type"=>"changeling/models/logling",
+              "_index"=>"changeling_test_changeling_models_loglings",
+              "_version"=>1,
+              "sort"=>[1354249567000],
+              "highlight"=>nil,
+              "_explanation"=>nil
+            }
+
+            @logling = @klass.new(@object)
+            @changes = JSON.parse(@object['modifications'])
+            @before, @after = @klass.parse_changes(@changes)
+            @modified_time = DateTime.parse(@object['modified_at'])
+          end
+
+          it "should set klass as the returned klass value" do
+            @logling.klass.should == @object['klass']
+          end
+
+          it "should set oid as the returned oid value" do
+            @logling.oid.should == @object['oid']
+          end
+
+          it "should set the modifications as the incoming changes parameter" do
+            @logling.modifications.should == @changes
+          end
+
+          it "should set before and after based on .parse_changes" do
+            @logling.before.should == @before
+            @logling.after.should == @after
+          end
+
+          it "should set modified_at as the parsed version of the returned modified_at value" do
+            @logling.modified_at.should == @modified_time
+          end
         end
 
-        it "should set klass as the .klassify-ed value" do
-          @logling.klass.should == @klass.klassify(@object)
-        end
+        context "when passed object is a real object" do
+          before(:each) do
+            @before, @after = @klass.parse_changes(@changes)
+          end
 
-        it "should set oid as the stringified object's ID" do
-          @logling.oid.should == @object.id.to_s
-        end
+          it "should set klass as the .klassify-ed value" do
+            @logling.klass.should == @klass.klassify(@object)
+          end
 
-        it "should set the modifications as the incoming changes parameter" do
-          @logling.modifications.should == @changes
-        end
+          it "should set oid as the stringified object's ID" do
+            @logling.oid.should == @object.id.to_s
+          end
 
-        it "should set before and after based on .parse_changes" do
-          @logling.before.should == @before
-          @logling.after.should == @after
-        end
+          it "should set the modifications as the incoming changes parameter" do
+            @logling.modifications.should == @changes
+          end
 
-        it "should set changed_at to the object's time of update if the object responds to the updated_at method" do
-          @object.should_receive(:respond_to?).with(:updated_at).and_return(true)
+          it "should set before and after based on .parse_changes" do
+            @logling.before.should == @before
+            @logling.after.should == @after
+          end
 
-          # Setting up a variable to prevent test flakiness from passing time.
-          time = Time.now
-          @object.stub(:updated_at).and_return(time)
+          it "should set modified_at to the object's time of update if the object responds to the updated_at method" do
+            @object.should_receive(:respond_to?).with(:updated_at).and_return(true)
 
-          # Create a new logling to trigger the initialize method
-          @logling = @klass.new(@object, @changes)
-          @logling.changed_at.should == @object.updated_at
-        end
+            # Setting up a variable to prevent test flakiness from passing time.
+            time = Time.now
+            @object.stub(:updated_at).and_return(time)
 
-        it "should set changed_at to the current time if the object doesn't respond to updated_at" do
-          @object.should_receive(:respond_to?).with(:updated_at).and_return(false)
+            # Create a new logling to trigger the initialize method
+            @logling = @klass.new(@object)
+            @logling.modified_at.should == @object.updated_at
+          end
 
-          # Setting up a variable to prevent test flakiness from passing time.
-          time = Time.now
-          Time.stub(:now).and_return(time)
+          it "should set modified_at to the current time if the object doesn't respond to updated_at" do
+            @object.should_receive(:respond_to?).with(:updated_at).and_return(false)
 
-          # Create a new logling to trigger the initialize method
-          @logling = @klass.new(@object, @changes)
-          @logling.changed_at.should == time
+            # Setting up a variable to prevent test flakiness from passing time.
+            time = Time.now
+            Time.stub(:now).and_return(time)
+
+            # Create a new logling to trigger the initialize method
+            @logling = @klass.new(@object)
+            @logling.modified_at.should == time
+          end
         end
       end
 
@@ -103,35 +150,7 @@ describe Changeling::Models::Logling do
       end
 
       describe ".records_for" do
-        it "should find the length of the Redis list" do
-          @key = @logling.redis_key
-          @klass.stub(:redis_key).and_return(@key)
-          $redis.should_receive(:llen).with(@key)
-          @klass.records_for(@object)
-        end
 
-        it "should not find the length of the Redis list if length option is passed" do
-          @key = @logling.redis_key
-          @klass.stub(:redis_key).and_return(@key)
-          $redis.should_not_receive(:llen).with(@key)
-          @klass.records_for(@object, 10)
-        end
-
-        it "should find all entries in the Redis list" do
-          @key = @logling.redis_key
-          @length = 100
-          @klass.stub(:redis_key).and_return(@key)
-          $redis.stub(:llen).and_return(@length)
-          $redis.should_receive(:lrange).with(@key, 0, @length).and_return([])
-          @klass.records_for(@object)
-        end
-
-        it "should find the specified amount of entries in the Redis list if length option is passed" do
-          @key = @logling.redis_key
-          @klass.stub(:redis_key).and_return(@key)
-          $redis.should_receive(:lrange).with(@key, 0, 5).and_return([])
-          @klass.records_for(@object, 5)
-        end
       end
     end
 
@@ -149,8 +168,14 @@ describe Changeling::Models::Logling do
           @logling.should_receive(:modifications)
         end
 
-        it "should include the object's changed_at attribute" do
-          @logling.should_receive(:changed_at)
+        it "should convert the object's modifications attribute to JSON" do
+          mods = {}
+          @logling.should_receive(:modifications).and_return(mods)
+          mods.should_receive(:to_json)
+        end
+
+        it "should include the object's modified_at attribute" do
+          @logling.should_receive(:modified_at)
         end
 
         after(:each) do
@@ -160,7 +185,7 @@ describe Changeling::Models::Logling do
 
       describe ".save" do
         it "should update the ElasticSearch index" do
-          @logling.should_receive(:update_elasticsearch_index)
+          @logling.should_receive(:_run_save_callbacks)
         end
 
         after(:each) do
