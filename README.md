@@ -102,7 +102,7 @@ log.klass # class of the object that the Logling is tracking.
 => Post
 
 log.oid # the ID of the object that the Logling is tracking.
-# Note: integer type IDs will be integers. Non-integer types (such as Mongo's IDs) will be represented as a string
+# Note: integer type IDs will be integers. Non-integer types (such as Mongo's IDs) will be represented as a string.
 => 1
 
 log.before # what the before state of the object was.
