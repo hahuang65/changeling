@@ -93,6 +93,17 @@ Access all of an objects history:
 @post.all_history
 ```
 
+Access all of an objects history where a specific field was changed:
+
+```ruby
+@post.history_for_field(:title)
+# Or if you prefer stringified fields:
+@post.history_for_field('title')
+
+# You can also pass in a number to limit your results
+@post.history_for_field(:title, 10)
+```
+
 Properties of Loglings (history objects):
 
 ```ruby
