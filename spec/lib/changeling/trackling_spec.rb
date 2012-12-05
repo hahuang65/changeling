@@ -11,26 +11,27 @@ describe Changeling::Trackling do
     end
 
     describe "callbacks" do
-      before(:each) do
-        @changes = args[:changes]
-      end
-
       it "should not create a logling when doing the initial save of a new object" do
         @klass.should_not_receive(:create)
-        @object.save!
+        @object.run_after_callbacks(:create)
       end
 
-      it "should create a logling with the changed attributes of an object when it is saved" do
-        # Persist object to DB so we can update it.
-        @object.save!
+      it "should create a logling when updating an object and changes are made" do
+        @klass.should_receive(:create)
+        @object.stub(:changes).and_return({ :field => 'value' })
+        @object.run_after_callbacks(:update)
+      end
 
-        @klass.should_receive(:create).with(@object)
+      it "should create a logling when updating an object and changes are empty" do
+        @klass.should_not_receive(:create)
+        @object.stub(:changes).and_return({})
+        @object.run_after_callbacks(:update)
+      end
 
-        @changes.each_pair do |k, v|
-          @object.send("#{k}=", v[1])
-        end
-
-        @object.save!
+      it "should not create a logling when updating an object and no changes have been made" do
+        @klass.should_not_receive(:create)
+        @object.stub(:changes).and_return(nil)
+        @object.run_after_callbacks(:update)
       end
     end
   end

@@ -5,7 +5,7 @@ module Changeling
     end
 
     def save_logling
-      if self.changes
+      if self.changes && !self.changes.empty?
         logling = Changeling::Models::Logling.create(self)
       end
     end

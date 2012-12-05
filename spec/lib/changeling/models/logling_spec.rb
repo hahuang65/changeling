@@ -38,15 +38,7 @@ describe Changeling::Models::Logling do
               "klass"=>"BlogPost",
               "oid"=>"50b8355f7a93d04908000001",
               "modifications"=>"{\"public\":[true,false]}",
-              "modified_at"=>"2012-11-29T20:26:07-08:00",
-              "id"=>"UU2YGr1WSbilNUlyM1ja8g",
-              "_score"=>nil,
-              "_type"=>"changeling/models/logling",
-              "_index"=>"changeling_test_changeling_models_loglings",
-              "_version"=>1,
-              "sort"=>[1354249567000],
-              "highlight"=>nil,
-              "_explanation"=>nil
+              "modified_at"=>"2012-11-29T20:26:07-08:00"
             }
 
             @logling = @klass.new(@object)
