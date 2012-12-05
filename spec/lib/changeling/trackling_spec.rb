@@ -33,14 +33,7 @@ describe Changeling::Trackling do
         end
 
         after(:each) do
-          # Pre 3.0 Mongoid doesn't have this constant defined...
-          if defined?(Mongoid::VERSION)
-            # Mongoid 3.0.3
-            @object.run_after_callbacks(:update)
-          else
-            # Mongoid 2.4.1
-            @object.run_callbacks(:after_update)
-          end
+          @object.run_callbacks(:update)
         end
       end
     end
