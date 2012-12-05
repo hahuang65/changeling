@@ -13,7 +13,7 @@ describe Changeling::Trackling do
     describe "callbacks" do
       it "should not create a logling when doing the initial save of a new object" do
         @klass.should_not_receive(:create)
-        @object.run_after_callbacks(:create)
+        @object.run_callbacks(:create)
       end
 
       context "after_update" do
