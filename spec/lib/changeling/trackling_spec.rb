@@ -16,22 +16,32 @@ describe Changeling::Trackling do
         @object.run_after_callbacks(:create)
       end
 
-      it "should create a logling when updating an object and changes are made" do
-        @klass.should_receive(:create)
-        @object.stub(:changes).and_return({ :field => 'value' })
-        @object.run_after_callbacks(:update)
-      end
+      context "after_update" do
+        it "should create a logling when updating an object and changes are made" do
+          @klass.should_receive(:create)
+          @object.stub(:changes).and_return({ :field => 'value' })
+        end
 
-      it "should create a logling when updating an object and changes are empty" do
-        @klass.should_not_receive(:create)
-        @object.stub(:changes).and_return({})
-        @object.run_after_callbacks(:update)
-      end
+        it "should create a logling when updating an object and changes are empty" do
+          @klass.should_not_receive(:create)
+          @object.stub(:changes).and_return({})
+        end
 
-      it "should not create a logling when updating an object and no changes have been made" do
-        @klass.should_not_receive(:create)
-        @object.stub(:changes).and_return(nil)
-        @object.run_after_callbacks(:update)
+        it "should not create a logling when updating an object and no changes have been made" do
+          @klass.should_not_receive(:create)
+          @object.stub(:changes).and_return(nil)
+        end
+
+        after(:each) do
+          # Pre 3.0 Mongoid doesn't have this constant defined...
+          if defined?(Mongoid::VERSION)
+            # Mongoid 3.0.3
+            @object.run_after_callbacks(:update)
+          else
+            # Mongoid 2.4.1
+            @object.run_callbacks(:after_update)
+          end
+        end
       end
     end
   end
