@@ -152,7 +152,6 @@ against the following interpreters (with corresponding ORM/ODMs) and datastores:
 ## TODO
 
 * Restore state from a Logling
-* Filter Loglings by which fields have changed.
 * Performance testing against large data loads.
 * Sinatra app to monitor changes as they happen in real-time.
 * Analytics for changes.
