@@ -2,7 +2,7 @@ module Changeling
   module Models
     class Logling
       extend ActiveModel::Naming
-      attr_accessor :klass, :oid, :modifications, :before, :after, :modified_at
+      attr_accessor :klass, :oid, :modifications, :before, :after, :modified_at, :modified_fields
 
       include Tire::Model::Search
       include Tire::Model::Persistence
@@ -10,12 +10,14 @@ module Changeling
       property :klass, :type => 'string'
       property :oid, :type => 'string'
       property :modifications, :type => 'string'
+      property :modified_fields, :type => 'string', :analyzer => 'keyword'
       property :modified_at, :type => 'date'
 
       mapping do
         indexes :klass, :type => "string"
         indexes :oid, :type => "string"
         indexes :modifications, :type => 'string'
+        indexes :modified_fields, :type => 'string', :analyzer => 'keyword'
         indexes :modified_at, :type => 'date'
       end
 
@@ -41,19 +43,36 @@ module Changeling
           object.class
         end
 
-        def records_for(object, length = nil)
+        # TODO: Refactor me! More specs!
+        def records_for(object, length = nil, field = nil)
           self.tire.index.refresh
-          results = self.search do
-           query do
-             filtered do
-               query { all }
-               filter :terms, :klass => [Logling.klassify(object).to_s.underscore]
-               filter :terms, :oid => [object.id.to_s]
-             end
-           end
 
-           sort { by :modified_at, "desc" }
-          end.results
+          if field
+            results = self.search do
+             query do
+               filtered do
+                 query { all }
+                 filter :terms, :klass => [Logling.klassify(object).to_s.underscore]
+                 filter :terms, :oid => [object.id.to_s]
+                 filter :terms, :modified_fields => [field]
+               end
+             end
+
+             sort { by :modified_at, "desc" }
+            end.results
+          else
+            results = self.search do
+             query do
+               filtered do
+                 query { all }
+                 filter :terms, :klass => [Logling.klassify(object).to_s.underscore]
+                 filter :terms, :oid => [object.id.to_s]
+               end
+             end
+
+             sort { by :modified_at, "desc" }
+            end.results
+          end
 
           if length
             results.take(length)
@@ -68,7 +87,8 @@ module Changeling
           :klass => self.klass.to_s.underscore,
           :oid => self.oid.to_s,
           :modifications => self.modifications.to_json,
-          :modified_at => self.modified_at
+          :modified_at => self.modified_at,
+          :modified_fields => self.modified_fields
         }.to_json
       end
 
@@ -87,19 +107,20 @@ module Changeling
           self.klass = object['klass'].camelize.constantize
           self.oid = object['oid'].to_i.to_s == object['oid'] ? object['oid'].to_i : object['oid']
           self.modifications = changes
+          self.modified_fields = self.modifications.keys
 
           self.before, self.after = Logling.parse_changes(changes)
 
           self.modified_at = DateTime.parse(object['modified_at'])
         else
-          changes = object.changes
-
+          changes = object.changes.reject { |k, v| v.nil? }
           # Remove updated_at field.
           changes.delete("updated_at")
 
           self.klass = Logling.klassify(object)
           self.oid = object.id
           self.modifications = changes
+          self.modified_fields = self.modifications.keys
 
           self.before, self.after = Logling.parse_changes(changes)
 
@@ -112,7 +133,9 @@ module Changeling
       end
 
       def save
-        _run_save_callbacks {}
+        unless self.modifications.empty?
+          _run_save_callbacks {}
+        end
       end
     end
   end

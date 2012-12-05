@@ -57,4 +57,90 @@ describe Changeling::Probeling do
       @object.history(20).count.should == 4
     end
   end
+
+  describe ".history_for_field" do
+    it "should query Logling with it's class name, and it's own ID, and a field name" do
+      @klass.should_receive(:records_for).with(@object, nil, "field")
+      @object.history_for_field("field")
+    end
+
+    it "should be able to take a length to specify amount of loglings to return" do
+      @klass.should_receive(:records_for).with(@object, 5, "field")
+      @object.history_for_field("field", 5)
+    end
+
+    it "should handle non-integer arguments for length" do
+      @klass.should_receive(:records_for).with(@object, 5, "field")
+      @object.history_for_field("field", "5")
+    end
+
+    it "should handle symbol arguments for field" do
+      @klass.should_receive(:records_for).with(@object, nil, "field")
+      @object.history_for_field(:field)
+    end
+
+    it "should only return loglings where the specified field has changed" do
+      models.values.each do |value|
+        value[:changes].keys.each do |field|
+          @object.history_for_field(field).each do |logling|
+            logling.modifications.keys.should include(field)
+          end
+
+          @object.history_for_field(field).count.should == 2
+        end
+      end
+    end
+
+    it "should be able to find loglings even if there was more than one change logged in the logling" do
+      models.each_pair do |model, args|
+        @object = model.new(args[:options])
+        @object.save!
+
+        args[:changes].each do |field, values|
+          values.reverse.each do |value|
+            @object.send("#{field}=", value)
+            @object.save!
+            # Sleep to guarantee saves are not within the same second.
+            sleep 1
+          end
+        end
+
+        # This should make 2 changes at the same time then save it
+        args[:changes].each do |field, values|
+          @object.send("#{field}=", values.last)
+        end
+
+        @object.save!
+      end
+
+      models.values.each do |value|
+        value[:changes].keys.each do |field|
+          # Reverse chronological order: first object is the last inserted, which should have 2 changes.
+          # The last object should have 1 change.
+          @object.history_for_field(field).last.modifications.keys.count.should == 1
+          @object.history_for_field(field).first.modifications.keys.count.should == 2
+
+          @object.history_for_field(field).count.should == 3
+        end
+      end
+    end
+
+    it "should only return the specified amount of loglings" do
+      models.values.each do |value|
+        value[:changes].keys.each do |field|
+          @object.history_for_field(field).count.should == 2
+          @object.history_for_field(field, 1).count.should == 1
+        end
+      end
+    end
+
+    it "should not error out if the record count desired is more than the total number of loglings" do
+      models.values.each do |value|
+        value[:changes].keys.each do |field|
+          @object.history_for_field(field).count.should == 2
+          @object.history_for_field(field, 10).count.should == 2
+        end
+      end
+    end
+  end
 end

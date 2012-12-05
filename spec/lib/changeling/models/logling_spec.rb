@@ -64,6 +64,10 @@ describe Changeling::Models::Logling do
             @logling.modifications.should == @changes
           end
 
+          it "should set the modified_fields as the keys of the modifications" do
+            @logling.modified_fields.should == @changes.keys
+          end
+
           it "should set before and after based on .parse_changes" do
             @logling.before.should == @before
             @logling.after.should == @after
@@ -94,6 +98,22 @@ describe Changeling::Models::Logling do
           it "should set before and after based on .parse_changes" do
             @logling.before.should == @before
             @logling.after.should == @after
+          end
+
+          it "should set the modified_fields as the keys of the modifications" do
+            @logling.modified_fields.should == @changes.keys
+          end
+
+          it "should ignore changes that are nil" do
+            changes = {}
+
+            @changes.keys.each do |key|
+              changes[key] = nil
+            end
+
+            @object.stub(:changes).and_return(changes)
+
+            @klass.new(@object).modifications.should be_empty
           end
 
           it "should set modified_at to the object's time of update if the object responds to the updated_at method" do
@@ -146,6 +166,7 @@ describe Changeling::Models::Logling do
         end
       end
 
+      # TODO: More specs!
       describe ".records_for" do
         before(:each) do
           @index = @klass.tire.index
@@ -196,6 +217,10 @@ describe Changeling::Models::Logling do
           @logling.should_receive(:modified_at)
         end
 
+        it "should include an array of the object's modified fields" do
+          @logling.should_receive(:modified_fields)
+        end
+
         after(:each) do
           @logling.to_indexed_json
         end
@@ -230,6 +255,11 @@ describe Changeling::Models::Logling do
       describe ".save" do
         it "should update the ElasticSearch index" do
           @logling.should_receive(:_run_save_callbacks)
+        end
+
+        it "should not update the index if there are no changes" do
+          @logling.stub(:modifications).and_return({})
+          @logling.should_not_receive(:_run_save_callbacks)
         end
 
         after(:each) do
