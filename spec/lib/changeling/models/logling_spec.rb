@@ -182,7 +182,7 @@ describe Changeling::Models::Logling do
 
         it "should only return the amount specified" do
           num = 5
-          @results.should_receive(:take).with(num)
+          @results.should_receive(:take).with(num).and_return([])
           @klass.records_for(@object, 5)
         end
 

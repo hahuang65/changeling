@@ -74,11 +74,18 @@ module Changeling
             end.results
           end
 
-          if length
-            results.take(length)
-          else
-            results
-          end
+          results = results.take(length) if length
+
+          # Some apps may return Tire::Results::Item objects in results instead of Changeling objects.
+          results.map { |result|
+            if result.class == Changeling::Models::Logling
+              result
+            elsif result.class == Tire::Results::Item
+              Logling.new(JSON.parse(result.to_json))
+            elsif result.class == Hash
+              Logling.new(result)
+            end
+          }
         end
       end
 
