@@ -91,6 +91,7 @@ module Changeling
 
       def to_indexed_json
         {
+          :id => self.id,
           :klass => self.klass.to_s.underscore,
           :oid => self.oid.to_s,
           :modifications => self.modifications.to_json,
@@ -106,6 +107,11 @@ module Changeling
           :modifications => self.modifications,
           :modified_at => self.modified_at
         }
+      end
+
+      def id
+        # Make sure ElasticSearch creates new entries rather than update old entries.
+        Digest::MD5.hexdigest("#{self.klass}:#{self.oid}:#{self.modifications}")
       end
 
       def initialize(object)

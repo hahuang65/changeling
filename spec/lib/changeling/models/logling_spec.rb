@@ -194,6 +194,11 @@ describe Changeling::Models::Logling do
     end
 
     context "Instance Methods" do
+      before(:each) do
+        # Stub :id so that it doesn't screw up these test's expectations.
+        @logling.stub(:id).and_return(1)
+      end
+
       describe ".to_indexed_json" do
         it "should include the object's klass attribute" do
           @logling.should_receive(:klass)
