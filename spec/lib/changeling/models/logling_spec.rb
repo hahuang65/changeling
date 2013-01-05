@@ -166,29 +166,58 @@ describe Changeling::Models::Logling do
         end
       end
 
-      # TODO: More specs!
       describe ".records_for" do
         before(:each) do
-          @index = @klass.tire.index
+          @search = Changeling::Support::Search
           @results = []
-          @klass.stub_chain(:tire, :index).and_return(@index)
-          @klass.stub_chain(:search, :results).and_return(@results)
         end
 
-        it "should refresh the ElasticSearch index" do
-          @index.should_receive(:refresh)
+        context "length parameter" do
+          before(:each) do
+            @search.stub(:find_by).and_return(@results)
+          end
+
+          it "should only return the amount specified" do
+            num = 5
+            @results.should_receive(:take).with(num).and_return([])
+            @klass.records_for(@object, 5)
+          end
+
+          it "should return all if no amount is specified" do
+            @results.should_not_receive(:take)
+            @klass.records_for(@object)
+          end
+        end
+
+        it "should search with filters on the klass and oid" do
+          @search.should_receive(:find_by).with(hash_including({
+            :filters => [
+              { :klass => @klass.klassify(@object).to_s.underscore },
+              { :oid => @object.id.to_s }
+            ]
+          })).and_return(@results)
           @klass.records_for(@object)
         end
 
-        it "should only return the amount specified" do
-          num = 5
-          @results.should_receive(:take).with(num).and_return([])
-          @klass.records_for(@object, 5)
+        it "should search with a filter on the field if one is passed in" do
+          @search.should_receive(:find_by).with(hash_including(
+            :filters => [
+              { :klass => @klass.klassify(@object).to_s.underscore },
+              { :oid => @object.id.to_s },
+              { :modified_fields => "field" }
+            ]
+          )).and_return(@results)
+          @klass.records_for(@object, nil, "field")
         end
 
-        it "should return all if no amount is specified" do
-          @results.should_not_receive(:take)
-          @klass.records_for(@object)
+        it "should sort by descending modified_at" do
+          @search.should_receive(:find_by).with(hash_including({
+            :sort => {
+              :field => :modified_at,
+              :direction => :desc
+            }
+          })).and_return(@results)
+          @klass.records_for(@object, nil)
         end
       end
     end

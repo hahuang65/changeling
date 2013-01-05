@@ -43,49 +43,26 @@ module Changeling
           object.class
         end
 
-        # TODO: Refactor me! More specs!
         def records_for(object, length = nil, field = nil)
-          self.tire.index.refresh
+          filters = [
+            { :klass => Logling.klassify(object).to_s.underscore },
+            { :oid => object.id.to_s }
+          ]
 
-          if field
-            results = self.search do
-             query do
-               filtered do
-                 query { all }
-                 filter :terms, :klass => [Logling.klassify(object).to_s.underscore]
-                 filter :terms, :oid => [object.id.to_s]
-                 filter :terms, :modified_fields => [field]
-               end
-             end
+          filters << { :modified_fields => field } if field
 
-             sort { by :modified_at, "desc" }
-            end.results
-          else
-            results = self.search do
-             query do
-               filtered do
-                 query { all }
-                 filter :terms, :klass => [Logling.klassify(object).to_s.underscore]
-                 filter :terms, :oid => [object.id.to_s]
-               end
-             end
-
-             sort { by :modified_at, "desc" }
-            end.results
-          end
-
-          results = results.take(length) if length
-
-          # Some apps may return Tire::Results::Item objects in results instead of Changeling objects.
-          results.map { |result|
-            if result.class == Changeling::Models::Logling
-              result
-            elsif result.class == Tire::Results::Item
-              Logling.new(JSON.parse(result.to_json))
-            elsif result.class == Hash
-              Logling.new(result)
-            end
+          sort = {
+            :field => :modified_at,
+            :direction => :desc
           }
+
+          results = Changeling::Support::Search.find_by(:filters => filters, :sort => sort)
+
+          if length
+            results.take(length)
+          else
+            results
+          end
         end
       end
 

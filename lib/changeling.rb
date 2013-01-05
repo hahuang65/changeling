@@ -11,4 +11,8 @@ module Changeling
   module Models
     autoload :Logling, 'changeling/models/logling'
   end
+
+  module Support
+    autoload :Search, 'changeling/support/search'
+  end
 end
