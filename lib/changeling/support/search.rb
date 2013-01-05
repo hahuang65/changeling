@@ -4,13 +4,12 @@ module Changeling
       def self.find_by(args)
         return [] unless args.kind_of?(Hash)
 
-        @class = Changeling::Models::Logling
-        @class.tire.index.refresh
-
         filters = args[:filters]
         sort = args[:sort]
-
         return [] unless filters || sort
+
+        @class = Changeling::Models::Logling
+        @class.tire.index.refresh
 
         results = @class.search do
           query do
