@@ -15,10 +15,24 @@ else
   Mongoid.database = Mongo::Connection.new('localhost','27017').db('changeling_test')
 end
 
+# ActiveRecord setup
+ActiveRecord::Base.establish_connection( :adapter => 'sqlite3', :database => ":memory:" )
+
+ActiveRecord::Migration.verbose = false
+ActiveRecord::Schema.define(:version => 1) do
+  # See the activerecord folder under spec/fixtures/models
+  create_table :blog_post_active_records do |t|
+    t.string  :title
+    t.string  :content
+    t.boolean :public
+  end
+end
+
 RSpec.configure do |config|
   config.mock_with :rspec
 
   config.before(:suite) do
+    DatabaseCleaner[:active_record].strategy = :truncation
     DatabaseCleaner[:mongoid].strategy = :truncation
     Tire::Model::Search.index_prefix "changeling_test"
   end
@@ -48,29 +62,21 @@ def clear_tire_indexes
 end
 
 def models
-  @models = {
-    BlogPost => {
-      :options => {
-        :title => "Changeling",
-        :content => "Something about Changeling",
-        :public => false
-      },
-      :changes => {
-        "public" => [false, true],
-        "content" => ["Something about Changeling", "Content about Changeling"]
-      }
+  hash = {
+    :options => {
+      :title => "Changeling",
+      :content => "Something about Changeling",
+      :public => false
     },
-
-    BlogPostNoTimestamp => {
-      :options => {
-        :title => "Changeling",
-        :content => "Something about Changeling",
-        :public => false
-      },
-      :changes => {
-        "public" => [false, true],
-        "content" => ["Something about Changeling", "Content about Changeling"]
-      }
+    :changes => {
+      "public" => [false, true],
+      "content" => ["Something about Changeling", "Content about Changeling"]
     }
+  }
+
+  @models = {
+    BlogPost => hash,
+    BlogPostNoTimestamp => hash,
+    BlogPostActiveRecord => hash
   }
 end

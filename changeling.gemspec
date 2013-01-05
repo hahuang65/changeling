@@ -34,4 +34,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "bson_ext"
   gem.add_development_dependency "database_cleaner"
+  gem.add_development_dependency "sqlite3"
 end
