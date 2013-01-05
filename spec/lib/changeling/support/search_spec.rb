@@ -54,12 +54,27 @@ describe Changeling::Support::Search do
         @search.find_by(@options).should == @results
       end
 
-      it "should parse them and convert them into Logling objects if they are returned as Tire::Results::Item objects"
+      it "should parse them and convert them into Logling objects if they are returned as Tire::Results::Item objects" do
+        @tire_object = Tire::Results::Item.new
+        @tire_json = "{}"
+        @hash = {}
+
+        @results = [@tire_object]
+        @klass.stub_chain(:search, :results).and_return(@results)
+
+        @tire_object.should_receive(:to_json).and_return(@tire_json)
+        JSON.should_receive(:parse).with(@tire_json).and_return(@hash)
+        @klass.should_receive(:new).with(@hash)
+
+        @search.find_by(@options)
+      end
 
       it "should convert them into Logling objects if they are returned as Hash objects" do
-        # @results.each { |r| r.stub(:class).and_return(Hash) }
-        # @results.each { |r| @klass.should_receive(:new).with(r) }
-        # @search.find_by(@options)
+        @results = [{}, {}]
+        @klass.stub_chain(:search, :results).and_return(@results)
+
+        @results.each { |r| @klass.should_receive(:new).with(r) }
+        @search.find_by(@options)
       end
     end
   end

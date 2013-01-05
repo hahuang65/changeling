@@ -83,8 +83,8 @@ describe Changeling::Models::Logling do
             @before, @after = @klass.parse_changes(@changes)
           end
 
-          it "should set klass as the .klassify-ed value" do
-            @logling.klass.should == @klass.klassify(@object)
+          it "should set klass as the object's class" do
+            @logling.klass.should == @object.class
           end
 
           it "should set oid as the object's ID" do
@@ -161,8 +161,8 @@ describe Changeling::Models::Logling do
       end
 
       describe ".klassify" do
-        it "should return the object's class" do
-          @klass.klassify(@object).should == @object.class
+        it "should return the object's class as an underscored string" do
+          @klass.klassify(@object).should == @object.class.to_s.underscore
         end
       end
 
@@ -192,7 +192,7 @@ describe Changeling::Models::Logling do
         it "should search with filters on the klass and oid" do
           @search.should_receive(:find_by).with(hash_including({
             :filters => [
-              { :klass => @klass.klassify(@object).to_s.underscore },
+              { :klass => @klass.klassify(@object) },
               { :oid => @object.id.to_s }
             ]
           })).and_return(@results)
@@ -202,7 +202,7 @@ describe Changeling::Models::Logling do
         it "should search with a filter on the field if one is passed in" do
           @search.should_receive(:find_by).with(hash_including(
             :filters => [
-              { :klass => @klass.klassify(@object).to_s.underscore },
+              { :klass => @klass.klassify(@object) },
               { :oid => @object.id.to_s },
               { :modified_fields => "field" }
             ]
@@ -266,7 +266,7 @@ describe Changeling::Models::Logling do
         end
 
         it "should include the object's klass attribute" do
-          @json[:class].should == @klass.klassify(@object)
+          @json[:class].should == @object.class
         end
 
         it "should include the object's oid attribute" do

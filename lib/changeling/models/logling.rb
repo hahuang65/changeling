@@ -40,12 +40,12 @@ module Changeling
         end
 
         def klassify(object)
-          object.class
+          object.class.to_s.underscore
         end
 
         def records_for(object, length = nil, field = nil)
           filters = [
-            { :klass => Logling.klassify(object).to_s.underscore },
+            { :klass => Logling.klassify(object) },
             { :oid => object.id.to_s }
           ]
 
@@ -107,7 +107,7 @@ module Changeling
           # Remove updated_at field.
           changes.delete("updated_at")
 
-          self.klass = Logling.klassify(object)
+          self.klass = object.class
           self.oid = object.id
           self.modifications = changes
           self.modified_fields = self.modifications.keys
