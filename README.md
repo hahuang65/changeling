@@ -155,4 +155,7 @@ against the following interpreters (with corresponding ORM/ODMs) and datastores:
 * Performance testing against large data loads.
 * Sinatra app to monitor changes as they happen in real-time.
 * Analytics for changes.
-* Much more...
+* Passing in "User" object to track the person who changed it.
+* Discrete mode (turn off tracking for a single transaction etc.)
+* Query by date range
+* Pagination

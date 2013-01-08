@@ -1,0 +1,18 @@
+%h2{ :style => "clear: both" } Changelog:
+
+.list-content
+  .list-entry.titles
+    .list-from.list-left.xwide= 'Changed From'
+    .list-to.list-left.xwide= "Changed To"
+    .list-date.list-left.xmid= "Date"
+  - loglings.each do |l|
+    .list-entry
+      .list-from.list-left.xwide
+        - before = ""
+        - l.before.each { |k, v| before << "\n#{k}: #{v}\n" }
+        = before[0..-1]
+      .list-to.list-left.xwide
+        - after = ""
+        - l.after.each { |k, v| after << "\n#{k}: #{v}\n" }
+        = after[0..-1]
+      .list-date.list-left.xmid= "#{time_ago_in_words(l.modified_at)} ago"
