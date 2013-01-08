@@ -39,6 +39,8 @@ $ brew install elasticsearch
 
 ## Usage
 
+### Model
+
 Include the Trackling module for any class you want to keep track of:
 
 ```ruby
@@ -130,6 +132,18 @@ log.modified_at # what time these changes were made.
 
 log.as_json # JSON representation of the changes.
 => {:class => Post, :oid => 1, :modifications=> { "title" => ["Old Title", "New Title"] }, :modified_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
+```
+
+### Controllers and Views
+
+There is a built-in view helper that you can use to display an object's change history
+
+```ruby
+# Display a list of changes to an object. Defaults to last 10 changes.
+list_changes(object)
+
+# Display last 20 changes.
+list_changes(object, 20)
 ```
 
 ## Testing
