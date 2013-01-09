@@ -1,0 +1,17 @@
+<div class="changeling-list">
+  <ul class="changeling-headers">
+    <li>Changed At</li>
+    <li>Changes Made</li>
+  </ul>
+
+  <% loglings.each do |l| %>
+    <ul class="changeling-history-item">
+      <li><%= l.modified_at.strftime("%B %d, %Y at %I:%M %p") %></li>
+      <li>
+        <ul>
+
+        </ul>
+      </li>
+    </ul>
+  <% end %>
+</div>

@@ -10,8 +10,3 @@ module Changeling
     end
   end
 end
-
-if defined?(ActionController)
-  ActionController::Base.helper Changeling::Support::Helpers
-  ActionController::Base.prepend_view_path File.dirname(__FILE__) + "/../../../app/views"
-end
