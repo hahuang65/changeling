@@ -1,4 +1,4 @@
-# Changeling [![Build Status][travis-image]][travis-link]
+# Changeling [![Build Status][travis-image]][travis-link] [![Gem Version](https://badge.fury.io/rb/changeling.png)](http://badge.fury.io/rb/changeling)
 
 [travis-image]: https://secure.travis-ci.org/hahuang65/Changeling.png?branch=master
 [travis-link]: http://travis-ci.org/hahuang65/Changeling
