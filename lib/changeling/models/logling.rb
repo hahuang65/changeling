@@ -2,13 +2,14 @@ module Changeling
   module Models
     class Logling
       extend ActiveModel::Naming
-      attr_accessor :klass, :oid, :modifications, :before, :after, :modified_at, :modified_fields
+      attr_accessor :klass, :oid, :modified_by, :modifications, :before, :after, :modified_at, :modified_fields
 
       include Tire::Model::Search
       include Tire::Model::Persistence
 
       property :klass, :type => 'string'
       property :oid, :type => 'string'
+      property :modified_by, :type => 'string'
       property :modifications, :type => 'string'
       property :modified_fields, :type => 'string', :analyzer => 'keyword'
       property :modified_at, :type => 'date'
@@ -16,6 +17,7 @@ module Changeling
       mapping do
         indexes :klass, :type => "string"
         indexes :oid, :type => "string"
+        indexes :modified_by, :type => "string"
         indexes :modifications, :type => 'string'
         indexes :modified_fields, :type => 'string', :analyzer => 'keyword'
         indexes :modified_at, :type => 'date'
@@ -71,6 +73,7 @@ module Changeling
           :id => self.id,
           :klass => self.klass.to_s.underscore,
           :oid => self.oid.to_s,
+          :modified_by => self.modified_by,
           :modifications => self.modifications.to_json,
           :modified_at => self.modified_at,
           :modified_fields => self.modified_fields
@@ -81,6 +84,7 @@ module Changeling
         {
           :class => self.klass,
           :oid => self.oid,
+          :modified_by => self.modified_by,
           :modifications => self.modifications,
           :modified_at => self.modified_at
         }
@@ -96,6 +100,7 @@ module Changeling
           changes = JSON.parse(object['modifications'])
           self.klass = object['klass'].camelize.constantize
           self.oid = object['oid'].to_i.to_s == object['oid'] ? object['oid'].to_i : object['oid']
+          self.modified_by = object['modified_by'].to_i.to_s == object['modified_by'] ? object['modified_by'].to_i : object['modified_by']
           self.modifications = changes
           self.modified_fields = self.modifications.keys
 
@@ -109,6 +114,7 @@ module Changeling
 
           self.klass = object.class
           self.oid = object.id
+          self.modified_by = Changeling.blame_user || nil
           self.modifications = changes
           self.modified_fields = self.modifications.keys
 

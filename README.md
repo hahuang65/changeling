@@ -49,7 +49,23 @@ class Post
 end
 ```
 
-That's it! Including the module will silently keep track of any changes made to objects of this class.
+If you want to keep track of the user who made the changes:
+
+```ruby
+# Doesn't have to be ApplicationController, perhaps you only want it in controllers for certain resources.
+class ApplicationController < ActionController::Base
+    include Changeling::Blameling
+    
+    # Changeling assumes your user is current_user, but if not, override the changeling_blame_user method like so:
+    def changeling_blame_user
+        current_account
+    end
+    
+    # Controller logic here...
+end
+```
+
+That's it! Including the module(s) will silently keep track of any changes made to objects of this class.
 For example:
 
 ```ruby
@@ -122,6 +138,11 @@ log.before # what the before state of the object was.
 log.after # what the after state of the object is.
 => {"title" => "New Title"}
 
+log.modified_by # ID of the user who made the changes to the object
+# Note: this could be nil if the Blameling module was not set up in you controller, or if changes were made from a place without a user object, such as the Rails console.
+# Note: integer type IDs will be integers. Non-integer types (such as Mongo's IDs) will be represented as a string.
+=> 33
+
 log.modifications # what changes were made to the object that this Logling recorded. Basically a roll up of the .before and .after methods.
 => {"title" => ["Old Title", "New Title"]}
 
@@ -129,7 +150,7 @@ log.modified_at # what time these changes were made.
 => Sat, 08 Sep 2012 10:21:46 UTC +00:00
 
 log.as_json # JSON representation of the changes.
-=> {:class => Post, :oid => 1, :modifications=> { "title" => ["Old Title", "New Title"] }, :modified_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
+=> {:class => Post, :oid => 1, :modified_by => 33, :modifications=> { "title" => ["Old Title", "New Title"] }, :modified_at => Sat, 08 Sep 2012 10:21:46 UTC +00:00}
 ```
 
 ## Testing
