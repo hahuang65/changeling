@@ -14,6 +14,5 @@ module Changeling
 
   module Support
     autoload :Search, 'changeling/support/search'
-    require 'changeling/support/helpers'
   end
 end
