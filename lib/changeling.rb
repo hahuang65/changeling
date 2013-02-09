@@ -7,6 +7,7 @@ module Changeling
 
   autoload :Trackling, 'changeling/trackling'
   autoload :Probeling, 'changeling/probeling'
+  autoload :Blameling, 'changeling/blameling'
 
   module Models
     autoload :Logling, 'changeling/models/logling'

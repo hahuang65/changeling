@@ -32,7 +32,9 @@ Gem::Specification.new do |gem|
   end
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"
+  gem.add_development_dependency "rspec-rails"
   gem.add_development_dependency "bson_ext"
   gem.add_development_dependency "database_cleaner"
   gem.add_development_dependency "sqlite3"
+  gem.add_development_dependency "rails"
 end

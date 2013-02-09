@@ -1,6 +1,9 @@
 require(File.expand_path('../../lib/changeling', __FILE__))
 require 'mongoid'
 require 'database_cleaner'
+require 'rails/all'
+require 'rspec/rails'
+require 'action_controller/railtie' # allows ActionController::Base
 
 # Fixtures
 Dir[File.dirname(__FILE__) + "/fixtures/**/*.rb"].each { |file| require file }

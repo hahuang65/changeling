@@ -114,7 +114,7 @@ module Changeling
 
           self.klass = object.class
           self.oid = object.id
-          self.modified_by = Changeling.blame_user || nil
+          self.modified_by = Changeling.blame_user.try(:id) || nil
           self.modifications = changes
           self.modified_fields = self.modifications.keys
 
