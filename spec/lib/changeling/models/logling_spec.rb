@@ -288,7 +288,7 @@ describe Changeling::Models::Logling do
 
       describe ".save" do
         it "should update the ElasticSearch index" do
-          @logling.should_receive(:_run_save_callbacks)
+          @logling.should_receive(:update_index)
         end
 
         it "should not update the index if there are no changes" do

@@ -5,6 +5,7 @@ module Changeling
       attr_accessor :klass, :oid, :modified_by, :modifications, :before, :after, :modified_at, :modified_fields
 
       include Tire::Model::Search
+      include Tire::Model::Callbacks
       include Tire::Model::Persistence
 
       property :klass, :type => 'string'
@@ -130,7 +131,7 @@ module Changeling
 
       def save
         unless self.modifications.empty?
-          _run_save_callbacks {}
+          self.update_index
         end
       end
     end
