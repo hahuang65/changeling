@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.version       = Changeling::VERSION
 
   # Dependencies
-  gem.add_dependency "tire"
+  gem.add_dependency "tire", "~> 0.5.4"
   gem.add_dependency "activemodel"
 
   # Development Dependencies
