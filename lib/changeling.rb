@@ -17,6 +17,16 @@ module Changeling
     autoload :Search, 'changeling/support/search'
   end
 
+  module Async
+    autoload :Trackling, 'changeling/async/trackling'
+    autoload :SidekiqWorker, 'changeling/async/sidekiq_worker'
+    autoload :ResqueWorker, 'changeling/async/resque_worker'
+  end
+
+  module Exceptions
+    autoload :AsyncGemRequired, 'changeling/exceptions/async_gem_required'
+  end
+
   def self.blame_user
     self.changeling_store[:blame_user]
   end

@@ -23,8 +23,14 @@ ActiveRecord::Base.establish_connection( :adapter => 'sqlite3', :database => ":m
 
 ActiveRecord::Migration.verbose = false
 ActiveRecord::Schema.define(:version => 1) do
-  # See the activerecord folder under spec/fixtures/models
+  # See the active_record models under spec/fixtures/models
   create_table :blog_post_active_records do |t|
+    t.string  :title
+    t.string  :content
+    t.boolean :public
+  end
+
+  create_table :async_blog_post_active_records do |t|
     t.string  :title
     t.string  :content
     t.boolean :public
@@ -64,7 +70,7 @@ def clear_tire_indexes
   end
 end
 
-def models
+def common_conditions
   hash = {
     :options => {
       :title => "Changeling",
@@ -76,10 +82,20 @@ def models
       "content" => ["Something about Changeling", "Content about Changeling"]
     }
   }
+end
 
+def models
   @models = {
-    BlogPost => hash,
-    BlogPostNoTimestamp => hash,
-    BlogPostActiveRecord => hash
+    BlogPost => common_conditions,
+    BlogPostNoTimestamp => common_conditions,
+    BlogPostActiveRecord => common_conditions
+  }
+end
+
+def async_models
+  @models = {
+    AsyncBlogPost => common_conditions,
+    AsyncBlogPostNoTimestamp => common_conditions,
+    AsyncBlogPostActiveRecord => common_conditions
   }
 end
