@@ -2,11 +2,6 @@ require 'spec_helper'
 
 module RailsApp
   class Application < Rails::Application
-    # app config here
-    # config.secret_token = '572c86f5ede338bd8aba8dae0fd3a326aabababc98d1e6ce34b9f5'
-    # routes.draw do
-    #   resources :blog_posts
-    # end
   end
 
   class ApplicationController < ActionController::Base

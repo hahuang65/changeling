@@ -8,6 +8,8 @@ module Changeling
       if self.changes && !self.changes.empty?
         logling = Changeling::Models::Logling.create(self)
       end
+
+      true
     end
   end
 end

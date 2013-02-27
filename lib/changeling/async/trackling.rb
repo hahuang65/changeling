@@ -19,6 +19,8 @@ module Changeling
             Resque.enqueue(Changeling::Async::ResqueWorker, logling.to_indexed_json)
           end
         end
+
+        true
       end
     end
   end

@@ -5,6 +5,8 @@
 [travis-home]: http://travis-ci.org/
 [brew-home]: http://mxcl.github.com/homebrew/
 [elasticsearch-home]: http://www.elasticsearch.org
+[sidekiq-home]: https://github.com/mperham/sidekiq
+[resque-home]: https://github.com/defunkt/resque
 
 A flexible and lightweight object change tracking system.
 
@@ -38,7 +40,7 @@ $ brew install elasticsearch
 ```
 
 ## Usage
-
+### Models
 Include the Trackling module for any class you want to keep track of:
 
 ```ruby
@@ -49,35 +51,40 @@ class Post
 end
 ```
 
-If you want to keep track of the user who made the changes:
+### Controllers
+If you are using a Rails app, and have the notion of a "user"", you may want to track of which user made which changes.
+Unfortunately models don't understand the concept of the currently signed in user. We'll have to leverage the controller to tack on this information.
 
 ```ruby
 # Doesn't have to be ApplicationController, perhaps you only want it in controllers for certain resources.
 class ApplicationController < ActionController::Base
     include Changeling::Blameling
-    
+
     # Changeling assumes your user is current_user, but if not, override the changeling_blame_user method like so:
     def changeling_blame_user
         current_account
     end
-    
+
     # Controller logic here...
 end
 ```
 
-That's it! Including the module(s) will silently keep track of any changes made to objects of this class.
-For example:
+### Asynchronous Tracking
+Sometimes in high production load, you don't want another gem clogging up your resource pipeline, slowing down performance and potentially causing downtime.
+Changeling has built-in Asynchronous support so you don't have to go and write your own callbacks and queues!
+Changeling is compatible with [Sidekiq][sidekiq-home] and [Resque][resque-home].
+When your object is saved, a job is placed in the 'changeling' queue.
 
 ```ruby
-@post = Post.first
-@post.title
-=> 'Old Title'
-@post.title = 'New Title'
-@post.save
+class Post
+  # include Changeling::Trackling
+  include Changeling::Async::Trackling
+  
+  # Model logic here...
+end
 ```
 
-This code will save a history that represents that the title for this post has been changed.
-
+### Accessing Changeling's history
 If you wish to see what has been logged, include the Probeling module:
 
 ```ruby
@@ -93,37 +100,40 @@ With Probeling, you can check out the changes that have been made! They're store
 You can access the up to the last 10 changes simply by calling
 
 ```ruby
-@post.history
+# Alias for this method: @post.history
+@post.loglings
 ```
 
-You can access a different number of records by passing in a number to the .history method:
+You can access a different number of records by passing in a number to the .loglings method:
 
 ```ruby
 # Will automatically handle if there are less than the number of histories requested.
-@post.history(50)
+@post.loglings(50)
 ```
 
 Access all of an objects history:
 
 ```ruby
-@post.all_history
+# Alias for this method: @post.all_history
+@post.all_loglings
 ```
 
 Access all of an objects history where a specific field was changed:
 
 ```ruby
-@post.history_for_field(:title)
+# Alias for this method: @post.history_for_field(field)
+@post.loglings_for_field(:title)
 # Or if you prefer stringified fields:
-@post.history_for_field('title')
+@post.loglings_for_field('title')
 
 # You can also pass in a number to limit your results
-@post.history_for_field(:title, 10)
+@post.loglings_for_field(:title, 10)
 ```
 
-Properties of Loglings (history objects):
+### Logling Properties (history objects):
 
 ```ruby
-log = @post.history.first
+log = @post.loglings.first
 
 log.klass # class of the object that the Logling is tracking.
 => Post
