@@ -8,10 +8,12 @@ module Changeling
         sort = args[:sort]
         return [] unless filters || sort
 
+        size = args[:size] || 10
+
         @class = Changeling::Models::Logling
         @class.tire.index.refresh
 
-        results = @class.search do
+        results = @class.search :per_page => size do
           query do
             filtered do
               query { all }

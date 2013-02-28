@@ -15,7 +15,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.all_loglings.last.modified_by.should == nil
+        BlogPost.last.loglings.first.modified_by.should == nil
       }.join
     end
   end
@@ -34,7 +34,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.all_loglings.last.modified_by.should == 33
+        BlogPost.last.loglings.first.modified_by.should == 33
       }.join
     end
   end
@@ -53,7 +53,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.all_loglings.last.modified_by.should == nil
+        BlogPost.last.loglings.first.modified_by.should == nil
       }.join
     end
   end
@@ -72,7 +72,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.all_loglings.last.modified_by.should == 88
+        BlogPost.last.loglings.first.modified_by.should == 88
       }.join
     end
   end

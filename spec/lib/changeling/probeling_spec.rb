@@ -17,18 +17,21 @@ describe Changeling::Probeling do
         end
       end
 
-      @object.all_loglings.count.should == 4
+      @object.loglings.count.should == 4
     end
   end
 
-  describe ".all_loglings" do
-    it "should query Logling with it's class name, and it's own ID" do
-      @klass.should_receive(:records_for).with(@object)
-      @object.all_loglings
+  describe "pagination" do
+    before(:each) do
+      (1..50).each do |num|
+        @object.title = "Title #{num}"
+        @object.save!
+      end
     end
 
-    it "should return an array of Loglings" do
-      @object.all_loglings.map(&:class).uniq.should == [@klass]
+    it "should return the specified amount of data when calling .loglings" do
+      @object.loglings.count.should == 10
+      @object.loglings(60).count.should == 54
     end
   end
 
@@ -49,7 +52,6 @@ describe Changeling::Probeling do
     end
 
     it "should only return the amount of loglings requested" do
-      @object.all_loglings.count.should == 4
       @object.loglings(2).count.should == 2
     end
 
@@ -59,8 +61,8 @@ describe Changeling::Probeling do
   end
 
   describe ".loglings_for_field" do
-    it "should query Logling with it's class name, and it's own ID, and a field name" do
-      @klass.should_receive(:records_for).with(@object, nil, "field")
+    it "should query Logling with it's class name, and it's own ID, a field name, and a default number of loglings to return" do
+      @klass.should_receive(:records_for).with(@object, 10, "field")
       @object.loglings_for_field("field")
     end
 
@@ -75,7 +77,7 @@ describe Changeling::Probeling do
     end
 
     it "should handle symbol arguments for field" do
-      @klass.should_receive(:records_for).with(@object, nil, "field")
+      @klass.should_receive(:records_for).with(@object, 10, "field")
       @object.loglings_for_field(:field)
     end
 

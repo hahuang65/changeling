@@ -176,14 +176,14 @@ describe Changeling::Models::Logling do
               @search.stub(:find_by).and_return(@results)
             end
 
-            it "should only return the amount specified" do
+            it "should be passed into the Search module" do
               num = 5
-              @results.should_receive(:take).with(num).and_return([])
+              @search.should_receive(:find_by).with(hash_including({ :size => num })).and_return(@results)
               @klass.records_for(@object, 5)
             end
 
-            it "should return all if no amount is specified" do
-              @results.should_not_receive(:take)
+            it "should pass nil for size option into Search module" do
+              @search.should_receive(:find_by).with(hash_including({ :size => nil })).and_return(@results)
               @klass.records_for(@object)
             end
           end

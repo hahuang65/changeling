@@ -79,7 +79,7 @@ When your object is saved, a job is placed in the 'changeling' queue.
 class Post
   # include Changeling::Trackling
   include Changeling::Async::Trackling
-  
+
   # Model logic here...
 end
 ```
@@ -111,14 +111,7 @@ You can access a different number of records by passing in a number to the .logl
 @post.loglings(50)
 ```
 
-Access all of an objects history:
-
-```ruby
-# Alias for this method: @post.all_history
-@post.all_loglings
-```
-
-Access all of an objects history where a specific field was changed:
+Access an object's last 10 changes where a specific field was changed:
 
 ```ruby
 # Alias for this method: @post.history_for_field(field)
@@ -126,8 +119,8 @@ Access all of an objects history where a specific field was changed:
 # Or if you prefer stringified fields:
 @post.loglings_for_field('title')
 
-# You can also pass in a number to limit your results
-@post.loglings_for_field(:title, 10)
+# You can also pass in a number to get more results
+@post.loglings_for_field(:title, 50)
 ```
 
 ### Logling Properties (history objects):

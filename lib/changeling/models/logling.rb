@@ -59,13 +59,7 @@ module Changeling
             :direction => :desc
           }
 
-          results = Changeling::Support::Search.find_by(:filters => filters, :sort => sort)
-
-          if length
-            results.take(length)
-          else
-            results
-          end
+          results = Changeling::Support::Search.find_by(:filters => filters, :sort => sort, :size => length)
         end
       end
 
