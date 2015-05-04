@@ -1,6 +1,6 @@
 # Changeling [![Build Status][travis-image]][travis-link] [![Gem Version](https://badge.fury.io/rb/changeling.png)](http://badge.fury.io/rb/changeling)
 
-[travis-image]: https://secure.travis-ci.org/hahuang65/Changeling.png?branch=master
+[travis-image]: https://travis-ci.org/hahuang65/changeling.svg?branch=master
 [travis-link]: http://travis-ci.org/hahuang65/Changeling
 [travis-home]: http://travis-ci.org/
 [brew-home]: http://mxcl.github.com/homebrew/
