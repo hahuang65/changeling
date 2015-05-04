@@ -161,7 +161,6 @@ log.as_json # JSON representation of the changes.
 This library is tested using [Travis][travis-home], where it is tested
 against the following interpreters (with corresponding ORM/ODMs) and datastores:
 
-* MRI 1.9.2 (Mongoid 2.4.1, ActiveRecord 3.1.3)
 * MRI 1.9.3 (Mongoid 3.0.3, ActiveRecord 3.2.7)
 * ElasticSearch (Tested on 0.19.9 with JVM 20.10-b01-428)
 
