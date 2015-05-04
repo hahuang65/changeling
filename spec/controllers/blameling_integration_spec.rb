@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe RailsApp, "Testing Blameling Integration", :type => :controller do
-  context "Controller without Blameling" do
+describe RailsApp, "Testing Blameling Integration" do
+  context "Controller without Blameling", :type => :controller do
     controller(RailsApp::BlogPostsController) do
       extend(RSpec::Rails::ControllerExampleGroup::BypassRescue)
     end
@@ -20,7 +20,7 @@ describe RailsApp, "Testing Blameling Integration", :type => :controller do
     end
   end
 
-  context "Controller with Blameling" do
+  context "Controller with Blameling", :type => :controller do
     controller(RailsApp::BlamelingController) do
       extend(RSpec::Rails::ControllerExampleGroup::BypassRescue)
     end
@@ -39,7 +39,7 @@ describe RailsApp, "Testing Blameling Integration", :type => :controller do
     end
   end
 
-  context "Controller with undefined current_user method" do
+  context "Controller with undefined current_user method", :type => :controller do
     controller(RailsApp::NoCurrentUserController) do
       extend(RSpec::Rails::ControllerExampleGroup::BypassRescue)
     end
@@ -58,7 +58,7 @@ describe RailsApp, "Testing Blameling Integration", :type => :controller do
     end
   end
 
-  context "Controller with a different overridden 'changeling_blame_user' method" do
+  context "Controller with a different overridden 'changeling_blame_user' method", :type => :controller do
     controller(RailsApp::CurrentAccountController) do
       extend(RSpec::Rails::ControllerExampleGroup::BypassRescue)
     end

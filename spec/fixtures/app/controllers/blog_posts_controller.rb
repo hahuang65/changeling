@@ -1,3 +1,5 @@
+require (File.expand_path('../../application', __FILE__))
+
 module RailsApp
   class BlogPostsController < ApplicationController
     def create
