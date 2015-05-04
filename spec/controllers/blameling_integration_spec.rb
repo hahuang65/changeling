@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RailsApp, "Testing Blameling Integration" do
+describe RailsApp, "Testing Blameling Integration", :type => :controller do
   context "Controller without Blameling" do
     controller(RailsApp::BlogPostsController) do
       extend(RSpec::Rails::ControllerExampleGroup::BypassRescue)
@@ -15,7 +15,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.loglings.first.modified_by.should == nil
+        expect(BlogPost.last.loglings.first.modified_by).to eq(nil)
       }.join
     end
   end
@@ -34,7 +34,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.loglings.first.modified_by.should == 33
+        expect(BlogPost.last.loglings.first.modified_by).to eq(33)
       }.join
     end
   end
@@ -53,7 +53,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.loglings.first.modified_by.should == nil
+        expect(BlogPost.last.loglings.first.modified_by).to eq(nil)
       }.join
     end
   end
@@ -72,7 +72,7 @@ describe RailsApp, "Testing Blameling Integration" do
       Thread.new {
         post :create
         # Look in application.rb for the User class and it's id method.
-        BlogPost.last.loglings.first.modified_by.should == 88
+        expect(BlogPost.last.loglings.first.modified_by).to eq(88)
       }.join
     end
   end

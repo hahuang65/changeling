@@ -35,27 +35,27 @@ describe Changeling::Async::Trackling do
           end
 
           it "should not create a logling when doing the initial save of a new object" do
-            @klass.should_not_receive(:new)
+            expect(@klass).not_to receive(:new)
             @object.run_callbacks(:create)
           end
 
           context "after_update" do
             it "should queue a logling to be made when updating an object and changes are made" do
-              @object.stub(:changes).and_return({ :field => 'value' })
-              @klass.should_receive(:new).and_return(@logling)
-              Changeling::Async::SidekiqWorker.should_receive(:perform_async).with(@logling.to_indexed_json)
+              allow(@object).to receive(:changes).and_return({ :field => 'value' })
+              expect(@klass).to receive(:new).and_return(@logling)
+              expect(Changeling::Async::SidekiqWorker).to receive(:perform_async).with(@logling.to_indexed_json)
             end
 
             it "should not queue a logling to be made when updating an object and changes are empty" do
-              @object.stub(:changes).and_return({})
-              @klass.should_not_receive(:new)
-              Changeling::Async::SidekiqWorker.should_not_receive(:perform_async)
+              allow(@object).to receive(:changes).and_return({})
+              expect(@klass).not_to receive(:new)
+              expect(Changeling::Async::SidekiqWorker).not_to receive(:perform_async)
             end
 
             it "should not queue a logling to be made when updating an object and no changes have been made" do
-              @object.stub(:changes).and_return(nil)
-              @klass.should_not_receive(:create)
-              Changeling::Async::SidekiqWorker.should_not_receive(:perform_async)
+              allow(@object).to receive(:changes).and_return(nil)
+              expect(@klass).not_to receive(:create)
+              expect(Changeling::Async::SidekiqWorker).not_to receive(:perform_async)
             end
 
             after(:each) do
@@ -76,27 +76,27 @@ describe Changeling::Async::Trackling do
           end
 
           it "should not create a logling when doing the initial save of a new object" do
-            @klass.should_not_receive(:new)
+            expect(@klass).not_to receive(:new)
             @object.run_callbacks(:create)
           end
 
           context "after_update" do
             it "should queue a logling to be made when updating an object and changes are made" do
-              @object.stub(:changes).and_return({ :field => 'value' })
-              @klass.should_receive(:new).and_return(@logling)
-              Resque.should_receive(:enqueue).with(Changeling::Async::ResqueWorker, @logling.to_indexed_json)
+              allow(@object).to receive(:changes).and_return({ :field => 'value' })
+              expect(@klass).to receive(:new).and_return(@logling)
+              expect(Resque).to receive(:enqueue).with(Changeling::Async::ResqueWorker, @logling.to_indexed_json)
             end
 
             it "should not queue a logling to be made when updating an object and changes are empty" do
-              @object.stub(:changes).and_return({})
-              @klass.should_not_receive(:new)
-              Resque.should_not_receive(:enqueue)
+              allow(@object).to receive(:changes).and_return({})
+              expect(@klass).not_to receive(:new)
+              expect(Resque).not_to receive(:enqueue)
             end
 
             it "should not queue a logling to be made when updating an object and no changes have been made" do
-              @object.stub(:changes).and_return(nil)
-              @klass.should_not_receive(:create)
-              Resque.should_not_receive(:enqueue)
+              allow(@object).to receive(:changes).and_return(nil)
+              expect(@klass).not_to receive(:create)
+              expect(Resque).not_to receive(:enqueue)
             end
 
             after(:each) do
@@ -113,10 +113,10 @@ describe Changeling::Async::Trackling do
           end
 
           it "should prefer Sidekiq to Resque" do
-            @object.stub(:changes).and_return({ :field => 'value' })
-            @klass.should_receive(:new).and_return(@logling)
-            Changeling::Async::SidekiqWorker.should_receive(:perform_async).with(@logling.to_indexed_json)
-            Resque.should_not_receive(:enqueue)
+            allow(@object).to receive(:changes).and_return({ :field => 'value' })
+            expect(@klass).to receive(:new).and_return(@logling)
+            expect(Changeling::Async::SidekiqWorker).to receive(:perform_async).with(@logling.to_indexed_json)
+            expect(Resque).not_to receive(:enqueue)
             @object.run_callbacks(:update)
           end
         end

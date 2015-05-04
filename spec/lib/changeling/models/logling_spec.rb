@@ -11,7 +11,7 @@ describe Changeling::Models::Logling do
       @object = model.new(args[:options])
       @changes = args[:changes]
 
-      @object.stub(:changes).and_return(@changes)
+      allow(@object).to receive(:changes).and_return(@changes)
       @logling = @klass.new(@object)
     end
 
@@ -19,12 +19,11 @@ describe Changeling::Models::Logling do
       context "Class Methods" do
         describe ".create" do
           before(:each) do
-
-            @klass.should_receive(:new).with(@object).and_return(@logling)
+            expect(@klass).to receive(:new).with(@object).and_return(@logling)
           end
 
           it "should call new with it's parameters then save the initialized logling" do
-            @logling.should_receive(:save)
+            expect(@logling).to receive(:save)
 
             @klass.create(@object)
           end
@@ -47,33 +46,33 @@ describe Changeling::Models::Logling do
             end
 
             it "should set klass as the returned klass value" do
-              @logling.klass.should == @object['klass'].constantize
+              expect(@logling.klass).to eq(@object['klass'].constantize)
             end
 
             it "should set oid as the returned oid value" do
-              @logling.oid.should == @object['oid']
+              expect(@logling.oid).to eq(@object['oid'])
             end
 
             it "should convert oid to an integer if it's supposed to be an integer" do
               @object["oid"] = "1"
-              @klass.new(@object).oid.should == @object["oid"].to_i
+              expect(@klass.new(@object).oid).to eq(@object["oid"].to_i)
             end
 
             it "should set the modifications as the incoming changes parameter" do
-              @logling.modifications.should == @changes
+              expect(@logling.modifications).to eq(@changes)
             end
 
             it "should set the modified_fields as the keys of the modifications" do
-              @logling.modified_fields.should == @changes.keys
+              expect(@logling.modified_fields).to eq(@changes.keys)
             end
 
             it "should set before and after based on .parse_changes" do
-              @logling.before.should == @before
-              @logling.after.should == @after
+              expect(@logling.before).to eq(@before)
+              expect(@logling.after).to eq(@after)
             end
 
             it "should set modified_at as the parsed version of the returned modified_at value" do
-              @logling.modified_at.should == @modified_time
+              expect(@logling.modified_at).to eq(@modified_time)
             end
           end
 
@@ -83,24 +82,24 @@ describe Changeling::Models::Logling do
             end
 
             it "should set klass as the object's class" do
-              @logling.klass.should == @object.class
+              expect(@logling.klass).to eq(@object.class)
             end
 
             it "should set oid as the object's ID" do
-              @logling.oid.should == @object.id
+              expect(@logling.oid).to eq(@object.id)
             end
 
             it "should set the modifications as the incoming changes parameter" do
-              @logling.modifications.should == @changes
+              expect(@logling.modifications).to eq(@changes)
             end
 
             it "should set before and after based on .parse_changes" do
-              @logling.before.should == @before
-              @logling.after.should == @after
+              expect(@logling.before).to eq(@before)
+              expect(@logling.after).to eq(@after)
             end
 
             it "should set the modified_fields as the keys of the modifications" do
-              @logling.modified_fields.should == @changes.keys
+              expect(@logling.modified_fields).to eq(@changes.keys)
             end
 
             it "should ignore changes that are nil" do
@@ -110,33 +109,32 @@ describe Changeling::Models::Logling do
                 changes[key] = nil
               end
 
-              @object.stub(:changes).and_return(changes)
+              allow(@object).to receive(:changes).and_return(changes)
 
-              @klass.new(@object).modifications.should be_empty
+              expect(@klass.new(@object).modifications).to be_empty
             end
 
             it "should set modified_at to the object's time of update if the object responds to the updated_at method" do
-              @object.should_receive(:respond_to?).with(:updated_at).and_return(true)
-
               # Setting up a variable to prevent test flakiness from passing time.
               time = Time.now
-              @object.stub(:updated_at).and_return(time)
+              allow(@object).to receive(:updated_at).and_return(time)
+              expect(@object).to receive(:respond_to?).with(:updated_at).and_return(true)
 
               # Create a new logling to trigger the initialize method
               @logling = @klass.new(@object)
-              @logling.modified_at.should == @object.updated_at
+              expect(@logling.modified_at).to eq(@object.updated_at)
             end
 
             it "should set modified_at to the current time if the object doesn't respond to updated_at" do
-              @object.should_receive(:respond_to?).with(:updated_at).and_return(false)
+              expect(@object).to receive(:respond_to?).with(:updated_at).and_return(false)
 
               # Setting up a variable to prevent test flakiness from passing time.
               time = Time.now
-              Time.stub(:now).and_return(time)
+              allow(Time).to receive(:now).and_return(time)
 
               # Create a new logling to trigger the initialize method
               @logling = @klass.new(@object)
-              @logling.modified_at.should == time
+              expect(@logling.modified_at).to eq(time)
             end
           end
         end
@@ -155,13 +153,13 @@ describe Changeling::Models::Logling do
           end
 
           it "should correctly match the before and after states of the object" do
-            @klass.parse_changes(@object.changes).should == [@before, @after]
+            expect(@klass.parse_changes(@object.changes)).to eq([@before, @after])
           end
         end
 
         describe ".klassify" do
           it "should return the object's class as an underscored string" do
-            @klass.klassify(@object).should == @object.class.to_s.underscore
+            expect(@klass.klassify(@object)).to eq(@object.class.to_s.underscore)
           end
         end
 
@@ -173,23 +171,23 @@ describe Changeling::Models::Logling do
 
           context "length parameter" do
             before(:each) do
-              @search.stub(:find_by).and_return(@results)
+              allow(@search).to receive(:find_by).and_return(@results)
             end
 
             it "should be passed into the Search module" do
               num = 5
-              @search.should_receive(:find_by).with(hash_including({ :size => num })).and_return(@results)
+              expect(@search).to receive(:find_by).with(hash_including({ :size => num })).and_return(@results)
               @klass.records_for(@object, 5)
             end
 
             it "should pass nil for size option into Search module" do
-              @search.should_receive(:find_by).with(hash_including({ :size => nil })).and_return(@results)
+              expect(@search).to receive(:find_by).with(hash_including({ :size => nil })).and_return(@results)
               @klass.records_for(@object)
             end
           end
 
           it "should search with filters on the klass and oid" do
-            @search.should_receive(:find_by).with(hash_including({
+            expect(@search).to receive(:find_by).with(hash_including({
               :filters => [
                 { :klass => @klass.klassify(@object) },
                 { :oid => @object.id.to_s }
@@ -199,7 +197,7 @@ describe Changeling::Models::Logling do
           end
 
           it "should search with a filter on the field if one is passed in" do
-            @search.should_receive(:find_by).with(hash_including(
+            expect(@search).to receive(:find_by).with(hash_including(
               :filters => [
                 { :klass => @klass.klassify(@object) },
                 { :oid => @object.id.to_s },
@@ -210,7 +208,7 @@ describe Changeling::Models::Logling do
           end
 
           it "should sort by descending modified_at" do
-            @search.should_receive(:find_by).with(hash_including({
+            expect(@search).to receive(:find_by).with(hash_including({
               :sort => {
                 :field => :modified_at,
                 :direction => :desc
@@ -224,34 +222,34 @@ describe Changeling::Models::Logling do
       context "Instance Methods" do
         before(:each) do
           # Stub :id so that it doesn't screw up these test's expectations.
-          @logling.stub(:id).and_return(1)
+          allow(@logling).to receive(:id).and_return(1)
         end
 
         describe ".to_indexed_json" do
           it "should include the object's klass attribute" do
-            @logling.should_receive(:klass)
+            expect(@logling).to receive(:klass)
           end
 
           it "should include the object's oid attribute" do
-            @logling.should_receive(:oid)
+            expect(@logling).to receive(:oid)
           end
 
           it "should include the object's modifications attribute" do
-            @logling.should_receive(:modifications)
+            expect(@logling).to receive(:modifications)
           end
 
           it "should convert the object's modifications attribute to JSON" do
             mods = {}
-            @logling.should_receive(:modifications).and_return(mods)
-            mods.should_receive(:to_json)
+            expect(@logling).to receive(:modifications).and_return(mods)
+            expect(mods).to receive(:to_json)
           end
 
           it "should include the object's modified_at attribute" do
-            @logling.should_receive(:modified_at)
+            expect(@logling).to receive(:modified_at)
           end
 
           it "should include an array of the object's modified fields" do
-            @logling.should_receive(:modified_fields)
+            expect(@logling).to receive(:modified_fields)
           end
 
           after(:each) do
@@ -265,19 +263,19 @@ describe Changeling::Models::Logling do
           end
 
           it "should include the object's klass attribute" do
-            @json[:class].should == @object.class
+            expect(@json[:class]).to eq(@object.class)
           end
 
           it "should include the object's oid attribute" do
-            @json[:oid].should == @object.id
+            expect(@json[:oid]).to eq(@object.id)
           end
 
           it "should include the object's modifications attribute" do
-            @json[:modifications].should == @changes
+            expect(@json[:modifications]).to eq(@changes)
           end
 
           it "should include the object's modified_at attribute" do
-            @json[:modified_at].should == @logling.modified_at
+            expect(@json[:modified_at]).to eq(@logling.modified_at)
           end
 
           after(:each) do
@@ -287,12 +285,12 @@ describe Changeling::Models::Logling do
 
         describe ".save" do
           it "should update the ElasticSearch index" do
-            @logling.should_receive(:update_index)
+            expect(@logling).to receive(:update_index)
           end
 
           it "should not update the index if there are no changes" do
-            @logling.stub(:modifications).and_return({})
-            @logling.should_not_receive(:_run_save_callbacks)
+            allow(@logling).to receive(:modifications).and_return({})
+            expect(@logling).not_to receive(:_run_save_callbacks)
           end
 
           after(:each) do

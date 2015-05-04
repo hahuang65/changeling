@@ -25,10 +25,12 @@ Gem::Specification.new do |gem|
     gem.add_development_dependency "mongoid", "2.4.1"
     gem.add_development_dependency "activerecord", "3.1.3"
     gem.add_development_dependency "ruby-debug19"
+    gem.add_development_dependency "sidekiq", "3.2.1"
   when "1.9.3"
     gem.add_development_dependency "mongoid", "3.0.3"
     gem.add_development_dependency "activerecord", "3.2.7"
     gem.add_development_dependency "debugger"
+    gem.add_development_dependency "sidekiq", "3.2.1"
   end
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"
@@ -37,6 +39,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "database_cleaner"
   gem.add_development_dependency "sqlite3"
   gem.add_development_dependency "rails"
-  gem.add_development_dependency "sidekiq"
   gem.add_development_dependency "resque"
 end

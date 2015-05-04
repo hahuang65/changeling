@@ -13,24 +13,24 @@ describe Changeling::Trackling do
     context "#{model}" do
       describe "callbacks" do
         it "should not create a logling when doing the initial save of a new object" do
-          @klass.should_not_receive(:create)
+          expect(@klass).not_to receive(:create)
           @object.run_callbacks(:create)
         end
 
         context "after_update" do
           it "should create a logling when updating an object and changes are made" do
-            @klass.should_receive(:create)
-            @object.stub(:changes).and_return({ :field => 'value' })
+            expect(@klass).to receive(:create)
+            allow(@object).to receive(:changes).and_return({ :field => 'value' })
           end
 
           it "should not create a logling when updating an object and changes are empty" do
-            @klass.should_not_receive(:create)
-            @object.stub(:changes).and_return({})
+            expect(@klass).not_to receive(:create)
+            allow(@object).to receive(:changes).and_return({})
           end
 
           it "should not create a logling when updating an object and no changes have been made" do
-            @klass.should_not_receive(:create)
-            @object.stub(:changes).and_return(nil)
+            expect(@klass).not_to receive(:create)
+            allow(@object).to receive(:changes).and_return(nil)
           end
 
           after(:each) do
