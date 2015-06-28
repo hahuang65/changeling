@@ -1,5 +1,7 @@
 desc "Benchmark Tire indexing times alone when objects are already created."
 task :benchmark_tire, :count, :fields do |t, args|
+  require 'benchmark'
+
   args.with_defaults(:count => 1000, :fields => 20)
   count = args[:count].to_i
   fields = args[:fields].to_i

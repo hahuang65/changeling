@@ -1,6 +1,6 @@
 # Changeling [![Build Status][travis-image]][travis-link] [![Gem Version](https://badge.fury.io/rb/changeling.png)](http://badge.fury.io/rb/changeling)
 
-[travis-image]: https://secure.travis-ci.org/hahuang65/Changeling.png?branch=master
+[travis-image]: https://travis-ci.org/hahuang65/changeling.svg?branch=master
 [travis-link]: http://travis-ci.org/hahuang65/Changeling
 [travis-home]: http://travis-ci.org/
 [brew-home]: http://mxcl.github.com/homebrew/
@@ -161,7 +161,6 @@ log.as_json # JSON representation of the changes.
 This library is tested using [Travis][travis-home], where it is tested
 against the following interpreters (with corresponding ORM/ODMs) and datastores:
 
-* MRI 1.9.2 (Mongoid 2.4.1, ActiveRecord 3.1.3)
 * MRI 1.9.3 (Mongoid 3.0.3, ActiveRecord 3.2.7)
 * ElasticSearch (Tested on 0.19.9 with JVM 20.10-b01-428)
 

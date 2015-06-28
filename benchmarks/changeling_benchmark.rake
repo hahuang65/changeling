@@ -1,5 +1,7 @@
 desc "Benchmark Changeling processing times, from after_save hook through the final Tire index update."
 task :benchmark_changeling, :count, :fields do |t, args|
+  require 'benchmark'
+
   args.with_defaults(:count => 1000, :fields => 20)
   count = args[:count].to_i
   fields = args[:fields].to_i
