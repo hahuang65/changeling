@@ -54,6 +54,8 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
   end
+
+  config.infer_spec_type_from_file_location!
 end
 
 # Inspiration from http://stackoverflow.com/questions/9676089/how-to-test-elasticsearch-in-a-rails-application-rspec

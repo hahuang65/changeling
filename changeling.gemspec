@@ -25,8 +25,12 @@ Gem::Specification.new do |gem|
     gem.add_development_dependency "mongoid", "3.0.3"
     gem.add_development_dependency "activerecord", "3.2.7"
     gem.add_development_dependency "debugger"
-    gem.add_development_dependency "sidekiq", "3.2.1"
+  when "2.1.5"
+    gem.add_development_dependency "mongoid", "3.1.7"
+    gem.add_development_dependency "activerecord", "3.2.22"
+    gem.add_development_dependency "pry"
   end
+  gem.add_development_dependency "sidekiq", "3.2.1"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "rspec-rails"
