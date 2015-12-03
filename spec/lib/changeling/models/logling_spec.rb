@@ -33,7 +33,7 @@ describe Changeling::Models::Logling do
           context "when passed object is a ElasticSearch response hash" do
             before(:each) do
               @object = {
-                "klass"=>"BlogPost",
+                "klass"=>["BlogPost"],
                 "oid"=>"50b8355f7a93d04908000001",
                 "modifications"=>"{\"public\":[true,false]}",
                 "modified_at"=>"2012-11-29T20:26:07-08:00"
@@ -189,7 +189,7 @@ describe Changeling::Models::Logling do
           it "should search with filters on the klass and oid" do
             expect(@search).to receive(:find_by).with(hash_including({
               :filters => [
-                { :klass => @klass.klassify(@object) },
+                { :klass => [@klass.klassify(@object)] },
                 { :oid => @object.id.to_s }
               ]
             })).and_return(@results)
@@ -199,7 +199,7 @@ describe Changeling::Models::Logling do
           it "should search with a filter on the field if one is passed in" do
             expect(@search).to receive(:find_by).with(hash_including(
               :filters => [
-                { :klass => @klass.klassify(@object) },
+                { :klass => [@klass.klassify(@object)] },
                 { :oid => @object.id.to_s },
                 { :modified_fields => "field" }
               ]
