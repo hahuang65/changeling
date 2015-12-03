@@ -16,9 +16,9 @@ module Changeling
       property :modified_at, :type => 'date'
 
       mapping do
-        indexes :klass, :type => "string"
-        indexes :oid, :type => "string"
-        indexes :modified_by, :type => "string"
+        indexes :klass, :type => 'string'
+        indexes :oid, :type => 'string'
+        indexes :modified_by, :type => 'string'
         indexes :modifications, :type => 'string'
         indexes :modified_fields, :type => 'string', :analyzer => 'keyword'
         indexes :modified_at, :type => 'date'
@@ -48,7 +48,7 @@ module Changeling
 
         def records_for(object, length = nil, field = nil)
           filters = [
-            { :klass => Logling.klassify(object) },
+            { :klass => Logling.klassify(object).split('/') },
             { :oid => object.id.to_s }
           ]
 
