@@ -18,7 +18,9 @@ module Changeling
             filtered do
               query { all }
               filters.each do |f|
-                filter :terms, { f.first[0].to_sym => Array(f.first[1]).map(&:to_s) }
+                filter :terms, {
+                  f.first[0].to_sym => Array(f.first[1]).map(&:to_s)
+                }
               end
             end
           end

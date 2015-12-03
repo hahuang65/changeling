@@ -8,9 +8,9 @@ module Changeling
       include Tire::Model::Callbacks
       include Tire::Model::Persistence
 
-      property :klass, :type => 'string'
-      property :oid, :type => 'string'
-      property :modified_by, :type => 'string'
+      property :klass, :type => "string"
+      property :oid, :type => "string"
+      property :modified_by, :type => "string"
       property :modifications, :type => 'string'
       property :modified_fields, :type => 'string', :analyzer => 'keyword'
       property :modified_at, :type => 'date'
